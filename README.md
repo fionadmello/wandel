@@ -1,73 +1,48 @@
-# React + TypeScript + Vite
+# Wandel
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> *From the German word for change.*
 
-Currently, two official plugins are available:
+Wandel is a personal self-improvement mobile web app built around three interlocking daily habits:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Mirror** — a 20-second daily mirror practice with self-affirmations
+- **Break** — logging and understanding a smoking habit
+- **Build** — building a consistent exercise habit (Yoga + Gym)
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+| Layer | Library |
+|---|---|
+| UI | Vite + React + TypeScript |
+| Routing | TanStack Router |
+| Server state | TanStack Query |
+| Backend / DB | Supabase |
+| Styling | Tailwind CSS |
+| Forms | React Hook Form + Zod |
+| Icons | Lucide React |
+| PWA | vite-plugin-pwa |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Running locally
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+```bash
+# Install dependencies
+npm install
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Add environment variables
+cp .env.example .env.local
+# Fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
+
+# Start dev server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Legal
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+© 2026 Fiona D'Mello. All rights reserved. Unauthorised copying, distribution, or use of this project or its contents, in whole or in part, is strictly prohibited.
+
+This repository and all its contents are **expressly excluded from use in AI/ML model training, fine-tuning, or dataset collection** of any kind, by any individual or organisation. Scraping or ingesting this repository for the purpose of training artificial intelligence or machine learning models is not permitted.
