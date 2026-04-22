@@ -70,7 +70,7 @@ export function SetupScreen() {
           onNext={(reminders) => advance({ reminders })}
         />
       )}
-      {step === 4 && <ConfirmStep draft={draft} onSubmit={() => {}} />}
+      {step === 4 && <ConfirmStep draft={draft} />}
     </ScreenWrap>
   );
 }
