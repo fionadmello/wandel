@@ -21,7 +21,7 @@ Inherits all rules from the global CLAUDE.md.
 
 - Routing: TanStack Router only. No `react-router-dom`.
 - Server state: TanStack Query for all Supabase data fetching and mutations.
-- Forms: React Hook Form + Zod. No uncontrolled inputs.
+- Forms: TanStack Form + Zod (`@tanstack/react-form`, `@tanstack/zod-form-adapter`). No uncontrolled inputs.
 - Styling: Tailwind CSS utility classes only. No inline styles, no CSS-in-JS.
 - Icons: Lucide React only.
 

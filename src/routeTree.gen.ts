@@ -8,149 +8,182 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as SettingsRouteImport } from "./routes/settings";
-import { Route as MorningRouteImport } from "./routes/morning";
-import { Route as HistoryRouteImport } from "./routes/history";
-import { Route as BuildRouteImport } from "./routes/build";
-import { Route as BreakRouteImport } from "./routes/break";
-import { Route as IndexRouteImport } from "./routes/index";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as MorningRouteImport } from './routes/morning'
+import { Route as HistoryRouteImport } from './routes/history'
+import { Route as BuildRouteImport } from './routes/build'
+import { Route as BreakRouteImport } from './routes/break'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as IndexRouteImport } from './routes/index'
 
 const SettingsRoute = SettingsRouteImport.update({
-  id: "/settings",
-  path: "/settings",
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const MorningRoute = MorningRouteImport.update({
-  id: "/morning",
-  path: "/morning",
+  id: '/morning',
+  path: '/morning',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const HistoryRoute = HistoryRouteImport.update({
-  id: "/history",
-  path: "/history",
+  id: '/history',
+  path: '/history',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const BuildRoute = BuildRouteImport.update({
-  id: "/build",
-  path: "/build",
+  id: '/build',
+  path: '/build',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const BreakRoute = BreakRouteImport.update({
-  id: "/break",
-  path: "/break",
+  id: '/break',
+  path: '/break',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/break": typeof BreakRoute;
-  "/build": typeof BuildRoute;
-  "/history": typeof HistoryRoute;
-  "/morning": typeof MorningRoute;
-  "/settings": typeof SettingsRoute;
+  '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/break': typeof BreakRoute
+  '/build': typeof BuildRoute
+  '/history': typeof HistoryRoute
+  '/morning': typeof MorningRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/break": typeof BreakRoute;
-  "/build": typeof BuildRoute;
-  "/history": typeof HistoryRoute;
-  "/morning": typeof MorningRoute;
-  "/settings": typeof SettingsRoute;
+  '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/break': typeof BreakRoute
+  '/build': typeof BuildRoute
+  '/history': typeof HistoryRoute
+  '/morning': typeof MorningRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/break": typeof BreakRoute;
-  "/build": typeof BuildRoute;
-  "/history": typeof HistoryRoute;
-  "/morning": typeof MorningRoute;
-  "/settings": typeof SettingsRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/break': typeof BreakRoute
+  '/build': typeof BuildRoute
+  '/history': typeof HistoryRoute
+  '/morning': typeof MorningRoute
+  '/settings': typeof SettingsRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/break" | "/build" | "/history" | "/morning" | "/settings";
-  fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/break" | "/build" | "/history" | "/morning" | "/settings";
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/break'
+    | '/build'
+    | '/history'
+    | '/morning'
+    | '/settings'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/auth'
+    | '/break'
+    | '/build'
+    | '/history'
+    | '/morning'
+    | '/settings'
   id:
-    | "__root__"
-    | "/"
-    | "/break"
-    | "/build"
-    | "/history"
-    | "/morning"
-    | "/settings";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/break'
+    | '/build'
+    | '/history'
+    | '/morning'
+    | '/settings'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  BreakRoute: typeof BreakRoute;
-  BuildRoute: typeof BuildRoute;
-  HistoryRoute: typeof HistoryRoute;
-  MorningRoute: typeof MorningRoute;
-  SettingsRoute: typeof SettingsRoute;
+  IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
+  BreakRoute: typeof BreakRoute
+  BuildRoute: typeof BuildRoute
+  HistoryRoute: typeof HistoryRoute
+  MorningRoute: typeof MorningRoute
+  SettingsRoute: typeof SettingsRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/settings": {
-      id: "/settings";
-      path: "/settings";
-      fullPath: "/settings";
-      preLoaderRoute: typeof SettingsRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/morning": {
-      id: "/morning";
-      path: "/morning";
-      fullPath: "/morning";
-      preLoaderRoute: typeof MorningRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/history": {
-      id: "/history";
-      path: "/history";
-      fullPath: "/history";
-      preLoaderRoute: typeof HistoryRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/build": {
-      id: "/build";
-      path: "/build";
-      fullPath: "/build";
-      preLoaderRoute: typeof BuildRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/break": {
-      id: "/break";
-      path: "/break";
-      fullPath: "/break";
-      preLoaderRoute: typeof BreakRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/morning': {
+      id: '/morning'
+      path: '/morning'
+      fullPath: '/morning'
+      preLoaderRoute: typeof MorningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/build': {
+      id: '/build'
+      path: '/build'
+      fullPath: '/build'
+      preLoaderRoute: typeof BuildRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/break': {
+      id: '/break'
+      path: '/break'
+      fullPath: '/break'
+      preLoaderRoute: typeof BreakRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   BreakRoute: BreakRoute,
   BuildRoute: BuildRoute,
   HistoryRoute: HistoryRoute,
   MorningRoute: MorningRoute,
   SettingsRoute: SettingsRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()

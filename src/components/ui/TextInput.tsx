@@ -8,6 +8,7 @@ interface TextInputProps {
   maxLength?: number;
   multiline?: boolean;
   rows?: number;
+  type?: "text" | "email" | "password";
 }
 
 export function TextInput({
@@ -18,6 +19,7 @@ export function TextInput({
   maxLength,
   multiline = false,
   rows = 3,
+  type = "text",
 }: TextInputProps) {
   if (multiline) {
     return (
@@ -36,7 +38,7 @@ export function TextInput({
   return (
     <input
       id={id}
-      type="text"
+      type={type}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
