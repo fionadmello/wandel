@@ -7,9 +7,8 @@ import { TOTAL_CONTENT_STEPS } from "@/constants/setupSteps";
 import type { SetupDraft } from "@/types/setup";
 
 import { ConfirmStep } from "./ConfirmStep";
-import { ExerciseStep } from "./ExerciseStep";
-import { JobsStep } from "./JobsStep";
 import { QualitiesStep } from "./QualitiesStep";
+import { RemindersStep } from "./RemindersStep";
 import { WelcomeStep } from "./WelcomeStep";
 import { WhyStep } from "./WhyStep";
 
@@ -66,15 +65,12 @@ export function SetupScreen() {
         />
       )}
       {step === 3 && (
-        <JobsStep values={draft.jobs} onNext={(jobs) => advance({ jobs })} />
-      )}
-      {step === 4 && (
-        <ExerciseStep
-          values={draft.exerciseTypes}
-          onNext={(exerciseTypes) => advance({ exerciseTypes })}
+        <RemindersStep
+          values={draft.reminders}
+          onNext={(reminders) => advance({ reminders })}
         />
       )}
-      {step === 5 && <ConfirmStep draft={draft} onSubmit={() => {}} />}
+      {step === 4 && <ConfirmStep draft={draft} onSubmit={() => {}} />}
     </ScreenWrap>
   );
 }

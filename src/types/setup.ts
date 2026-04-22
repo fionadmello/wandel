@@ -1,3 +1,8 @@
+export interface JobOption {
+  name: string;
+  description: string;
+}
+
 export interface ExerciseConfig {
   name: string;
   anchor: string;
@@ -9,6 +14,5 @@ export interface ExerciseConfig {
 export interface SetupDraft {
   whyStatement: string;
   qualities: string[];
-  jobs: string[];
-  exerciseTypes: ExerciseConfig[];
+  reminders: string[];
 }

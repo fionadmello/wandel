@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/Button";
-import type { SetupDraft } from "@/types/setup";
+import type { ExerciseConfig as ExerciseConfigType } from "@/types/setup";
 
-interface ExerciseStepProps {
-  values: SetupDraft["exerciseTypes"];
-  onNext: (values: SetupDraft["exerciseTypes"]) => void;
+interface ExerciseConfigProps {
+  values: ExerciseConfigType[];
+  onNext: (values: ExerciseConfigType[]) => void;
 }
 
-export function ExerciseStep({ values, onNext }: ExerciseStepProps) {
+export function ExerciseConfig({ values, onNext }: ExerciseConfigProps) {
   return (
     <div className="flex flex-col justify-center min-h-dvh px-8 gap-6">
       <p className="font-sans text-sm text-muted">
