@@ -25,13 +25,14 @@ function RootLayout() {
 export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session && location.pathname !== "/auth") {
+    if (!user && location.pathname !== "/auth") {
+      await supabase.auth.signOut();
       throw redirect({ to: "/auth" });
     }
-    if (session && location.pathname === "/auth") {
+    if (user && location.pathname === "/auth") {
       throw redirect({ to: "/morning" });
     }
   },
