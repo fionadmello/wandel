@@ -2,6 +2,7 @@ import {
   createRootRoute,
   Outlet,
   redirect,
+  useNavigate,
   useRouterState,
 } from "@tanstack/react-router";
 
@@ -13,11 +14,14 @@ const CHROME_HIDDEN_ROUTES = ["/auth", "/setup"];
 
 function RootLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
   const hideChrome = CHROME_HIDDEN_ROUTES.includes(pathname);
+  const onSettings =
+    pathname !== "/settings" ? () => navigate({ to: "/settings" }) : undefined;
 
   return (
     <>
-      {!hideChrome && <StatusBar />}
+      {!hideChrome && <StatusBar onSettings={onSettings} />}
       <Outlet />
       {!hideChrome && <TabBar />}
     </>
