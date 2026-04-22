@@ -9,15 +9,17 @@ import { StatusBar } from "@/components/layout/StatusBar";
 import { TabBar } from "@/components/layout/TabBar";
 import { supabase } from "@/lib/supabase";
 
+const CHROME_HIDDEN_ROUTES = ["/auth", "/setup"];
+
 function RootLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const isAuthRoute = pathname === "/auth";
+  const hideChrome = CHROME_HIDDEN_ROUTES.includes(pathname);
 
   return (
     <>
-      {!isAuthRoute && <StatusBar />}
+      {!hideChrome && <StatusBar />}
       <Outlet />
-      {!isAuthRoute && <TabBar />}
+      {!hideChrome && <TabBar />}
     </>
   );
 }
@@ -28,11 +30,31 @@ export const Route = createRootRoute({
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user && location.pathname !== "/auth") {
-      await supabase.auth.signOut();
-      throw redirect({ to: "/auth" });
+    if (!user) {
+      if (location.pathname !== "/auth") {
+        await supabase.auth.signOut();
+        throw redirect({ to: "/auth" });
+      }
+      return;
     }
-    if (user && location.pathname === "/auth") {
+
+    if (location.pathname === "/auth") {
+      throw redirect({ to: "/morning" });
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("setup_complete")
+      .eq("id", user.id)
+      .single();
+
+    const setupComplete = profile?.setup_complete ?? false;
+
+    if (!setupComplete && location.pathname !== "/setup") {
+      throw redirect({ to: "/setup" });
+    }
+
+    if (setupComplete && location.pathname === "/setup") {
       throw redirect({ to: "/morning" });
     }
   },
