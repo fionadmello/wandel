@@ -1,8 +1,11 @@
+import { INPUT_CLASSES } from "@/constants/inputClasses";
+
 interface TextInputProps {
   id?: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  maxLength?: number;
   multiline?: boolean;
   rows?: number;
 }
@@ -12,6 +15,7 @@ export function TextInput({
   value,
   onChange,
   placeholder,
+  maxLength,
   multiline = false,
   rows = 3,
 }: TextInputProps) {
@@ -22,7 +26,9 @@ export function TextInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
+        maxLength={maxLength}
         rows={rows}
+        className={INPUT_CLASSES}
       />
     );
   }
@@ -34,6 +40,8 @@ export function TextInput({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
+      maxLength={maxLength}
+      className={INPUT_CLASSES}
     />
   );
 }

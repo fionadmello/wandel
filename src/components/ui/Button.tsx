@@ -1,10 +1,11 @@
+import { BUTTON_VARIANT_CLASSES } from "@/constants/buttonVariants";
+
 interface ButtonProps {
-  variant?: "primary" | "accent" | "ghost";
+  variant?: keyof typeof BUTTON_VARIANT_CLASSES;
   children: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
-  className?: string;
 }
 
 export function Button({
@@ -13,15 +14,13 @@ export function Button({
   onClick,
   disabled,
   type = "button",
-  className,
 }: ButtonProps) {
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={className}
-      data-variant={variant}
+      className={`w-full block text-center leading-tight transition-opacity border-none ${disabled ? "opacity-50 cursor-default" : "opacity-100 cursor-pointer"} ${BUTTON_VARIANT_CLASSES[variant]}`}
     >
       {children}
     </button>

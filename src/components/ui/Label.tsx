@@ -4,5 +4,12 @@ interface LabelProps {
 }
 
 export function Label({ children, htmlFor }: LabelProps) {
-  return <label htmlFor={htmlFor}>{children}</label>;
+  return (
+    <label
+      htmlFor={htmlFor}
+      className="block font-sans font-medium text-[9px] text-amber tracking-[0.09em] uppercase mb-2"
+    >
+      {children}
+    </label>
+  );
 }

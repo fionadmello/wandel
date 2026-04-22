@@ -25,6 +25,13 @@ Inherits all rules from the global CLAUDE.md.
 - Styling: Tailwind CSS utility classes only. No inline styles, no CSS-in-JS.
 - Icons: Lucide React only.
 
+## File structure
+
+- One function per file, two at most. One export per file.
+- Icon components live in their own files under `src/components/icons/`.
+- All app-wide constants live in `src/constants/` as separate files (e.g. `tabs.ts`, `emotions.ts`, `markLabels.ts`).
+- Complex reusable CSS values (shadows, gradients) go in `@utility` blocks in `src/index.css`, not in component files.
+
 ## Design system
 
 - All colours must reference design tokens (`--canvas`, `--plum`, `--amber`, `--violet`, `--card`, `--border`, `--soft`, `--muted`, `--teal`). No raw hex values in components.

@@ -192,7 +192,7 @@ export interface Database {
           user_id: string;
           date: string;
           sub_type: string | null;
-          mark_type: "circle" | "dot" | "half";
+          mark_type: "full" | "dot" | "half";
           mark_label: string;
           note: string | null;
           logged_at: string;
@@ -203,14 +203,14 @@ export interface Database {
           user_id: string;
           date: string;
           sub_type?: string | null;
-          mark_type: "circle" | "dot" | "half";
+          mark_type: "full" | "dot" | "half";
           mark_label: string;
           note?: string | null;
           logged_at?: string;
         };
         Update: {
           sub_type?: string | null;
-          mark_type?: "circle" | "dot" | "half";
+          mark_type?: "full" | "dot" | "half";
           mark_label?: string;
           note?: string | null;
         };
@@ -240,7 +240,7 @@ export type BuildObservation =
 // App-level types
 export type HabitCategory = "break" | "build";
 
-export type MarkType = "circle" | "dot" | "half";
+export type MarkType = "full" | "dot" | "half";
 
 export interface HabitWithConfigs extends Habit {
   configs: HabitConfig[];
