@@ -1,7 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-
-import { BreakScreen } from "@/features/break/BreakScreen";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/break")({
-  component: BreakScreen,
+  component: Outlet,
 });

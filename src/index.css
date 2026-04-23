@@ -60,6 +60,40 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+@layer components {
+  .urge-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px;
+    border-radius: 9999px;
+    background: linear-gradient(
+      to right,
+      var(--color-amber) var(--urge-fill, 0%),
+      var(--color-soft) var(--urge-fill, 0%)
+    );
+    outline: none;
+  }
+
+  .urge-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-amber);
+    cursor: pointer;
+    margin-top: -7px;
+  }
+
+  .urge-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-amber);
+    border: none;
+    cursor: pointer;
+  }
+}
+
 @layer base {
   *,
   *::before,

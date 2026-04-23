@@ -1,0 +1,263 @@
+import { Check } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { Button } from "@/components/ui/Button";
+import { Chip } from "@/components/ui/Chip";
+import { Divider } from "@/components/ui/Divider";
+import { Label } from "@/components/ui/Label";
+import { UrgeSlider } from "@/components/ui/UrgeSlider";
+import { EMOTIONS } from "@/constants/emotions";
+import {
+  useLogBreakObservation,
+  useUpdateBreakObservationAftermath,
+} from "@/hooks/useBreakObservations";
+import type { HabitConfig } from "@/types/database";
+
+type LogPhase = "form" | "confirming" | "aftermath";
+
+interface AftermathPhaseProps {
+  initialEmotions: string[];
+  onSave: (emotions: string[]) => void;
+  onSkip: () => void;
+  isPending: boolean;
+}
+
+function AftermathPhase({
+  initialEmotions,
+  onSave,
+  onSkip,
+  isPending,
+}: AftermathPhaseProps) {
+  const [emotions, setEmotions] = useState<string[]>(initialEmotions);
+
+  const toggle = (e: string) =>
+    setEmotions((prev) =>
+      prev.includes(e) ? prev.filter((x) => x !== e) : [...prev, e],
+    );
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-1">
+        <p className="font-serif italic text-[20px] text-plum leading-snug">
+          How do you feel now?
+        </p>
+        <p className="font-sans text-xs text-muted">Update or keep the same.</p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {EMOTIONS.map((e) => (
+          <Chip
+            key={e}
+            label={e}
+            selected={emotions.includes(e)}
+            onToggle={() => toggle(e)}
+          />
+        ))}
+      </div>
+
+      <Button
+        variant="primary"
+        onClick={() => onSave(emotions)}
+        disabled={isPending}
+      >
+        {isPending ? "Saving…" : "Save aftermath"}
+      </Button>
+      <button
+        type="button"
+        onClick={onSkip}
+        className="font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer"
+      >
+        Skip
+      </button>
+    </div>
+  );
+}
+
+interface LogFormProps {
+  userId: string;
+  habitId: string;
+  jobConfigs: HabitConfig[];
+}
+
+export function LogForm({ userId, habitId, jobConfigs }: LogFormProps) {
+  const [phase, setPhase] = useState<LogPhase>("form");
+  const [context, setContext] = useState("");
+  const [selectedJob, setSelectedJob] = useState<string | null>(null);
+  const [urge, setUrge] = useState(5);
+  const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
+  const [observationId, setObservationId] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
+
+  const { mutate: logObservation, isPending: isLogging } =
+    useLogBreakObservation(userId);
+  const { mutate: updateAftermath, isPending: isSavingAftermath } =
+    useUpdateBreakObservationAftermath();
+
+  const jobs = (jobConfigs ?? []).filter((c) => c.key === "job");
+
+  const toggleEmotion = (e: string) =>
+    setSelectedEmotions((prev) =>
+      prev.includes(e) ? prev.filter((x) => x !== e) : [...prev, e],
+    );
+
+  const resetForm = () => {
+    setPhase("form");
+    setContext("");
+    setSelectedJob(null);
+    setUrge(5);
+    setSelectedEmotions([]);
+    setObservationId(null);
+    setSubmitted(false);
+  };
+
+  const handleSubmit = () => {
+    setSubmitted(true);
+    if (!selectedJob || selectedEmotions.length === 0) return;
+
+    logObservation(
+      {
+        habit_id: habitId,
+        job: selectedJob,
+        context: context.trim() || undefined,
+        urge_intensity: urge,
+        emotions: selectedEmotions,
+      },
+      {
+        onSuccess: (obs) => {
+          setObservationId(obs.id);
+          setPhase("confirming");
+        },
+      },
+    );
+  };
+
+  useEffect(() => {
+    if (phase !== "confirming") return;
+    const timer = setTimeout(() => setPhase("aftermath"), 800);
+    return () => clearTimeout(timer);
+  }, [phase]);
+
+  const jobMissing = submitted && !selectedJob;
+  const emotionsMissing = submitted && selectedEmotions.length === 0;
+
+  if (phase === "confirming") {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <p className="font-serif italic text-[28px] text-plum">Logged.</p>
+      </div>
+    );
+  }
+
+  if (phase === "aftermath") {
+    return (
+      <AftermathPhase
+        initialEmotions={selectedEmotions}
+        isPending={isSavingAftermath}
+        onSave={(emotions) => {
+          if (!observationId) return;
+          updateAftermath(
+            { id: observationId, aftermath: "", emotions, userId },
+            { onSuccess: resetForm },
+          );
+        }}
+        onSkip={resetForm}
+      />
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      {jobs.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <Label>What job is it doing?</Label>
+          <div className="flex flex-col gap-2">
+            {jobs.map((job) => (
+              <button
+                key={job.id}
+                type="button"
+                onClick={() => {
+                  setSelectedJob(job.value);
+                  setSubmitted(false);
+                }}
+                className={`flex items-center justify-between gap-3 w-full text-left px-4 py-3 rounded-2xl bg-card border-l-[3px] transition-colors duration-100 border-none cursor-pointer ${
+                  selectedJob === job.value
+                    ? "border-l-amber"
+                    : jobMissing
+                      ? "border-l-amber/40"
+                      : "border-l-transparent"
+                }`}
+              >
+                <div className="flex flex-col gap-[2px]">
+                  <span className="font-sans text-[13px] font-medium text-plum">
+                    {job.value}
+                  </span>
+                  {job.sub_type && (
+                    <span className="font-sans text-[11px] text-muted">
+                      {job.sub_type}
+                    </span>
+                  )}
+                </div>
+                {selectedJob === job.value && (
+                  <Check
+                    size={15}
+                    strokeWidth={2.5}
+                    className="text-amber shrink-0"
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+          {jobMissing && (
+            <p className="font-sans text-[11px] text-amber">
+              Select a job to continue.
+            </p>
+          )}
+        </div>
+      )}
+
+      <div className="flex flex-col gap-2">
+        <Label>Context</Label>
+        <textarea
+          value={context}
+          onChange={(e) => setContext(e.target.value)}
+          rows={2}
+          placeholder="What's happening right now? (optional)"
+          className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none resize-none placeholder:text-muted"
+        />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label>Urge intensity</Label>
+        <UrgeSlider value={urge} onChange={setUrge} />
+      </div>
+
+      <Divider className="my-0" />
+
+      <div className="flex flex-col gap-2">
+        <Label>How are you feeling?</Label>
+        <div className="flex flex-wrap gap-2">
+          {EMOTIONS.map((e) => (
+            <Chip
+              key={e}
+              label={e}
+              selected={selectedEmotions.includes(e)}
+              onToggle={() => {
+                toggleEmotion(e);
+                setSubmitted(false);
+              }}
+            />
+          ))}
+        </div>
+        {emotionsMissing && (
+          <p className="font-sans text-[11px] text-amber">
+            Select at least one emotion.
+          </p>
+        )}
+      </div>
+
+      <Button variant="accent" onClick={handleSubmit} disabled={isLogging}>
+        {isLogging ? "Logging…" : "Log it"}
+      </Button>
+    </div>
+  );
+}

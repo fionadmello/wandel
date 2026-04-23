@@ -9,7 +9,7 @@ export function TabBar() {
   return (
     <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-tabbar backdrop-blur-[12px] border-t border-t-soft shadow-tabbar flex z-[100] pb-safe">
       {TABS.map(({ id, label, route, Icon }) => {
-        const active = pathname === route;
+        const active = pathname === route || pathname.startsWith(route + "/");
         return (
           <button
             key={id}

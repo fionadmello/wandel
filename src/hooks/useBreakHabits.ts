@@ -10,7 +10,7 @@ export function useBreakHabits(userId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("habits")
-        .select("*, habit_configs(*)")
+        .select("*, configs:habit_configs(*)")
         .eq("user_id", userId)
         .eq("category", "break")
         .order("sort_order");
@@ -19,6 +19,24 @@ export function useBreakHabits(userId: string) {
       return data as HabitWithConfigs[];
     },
     enabled: !!userId,
+  });
+}
+
+export function useBreakHabit(userId: string, habitId: string) {
+  return useQuery({
+    queryKey: ["break_habit", userId, habitId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("habits")
+        .select("*, configs:habit_configs(*)")
+        .eq("user_id", userId)
+        .eq("id", habitId)
+        .single();
+
+      if (error) throw error;
+      return data as HabitWithConfigs;
+    },
+    enabled: !!userId && !!habitId,
   });
 }
 

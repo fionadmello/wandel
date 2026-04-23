@@ -7,10 +7,7 @@ export function useUpdateHabitStatus(userId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: {
-      habitId: string;
-      status: Exclude<HabitStatus, "active">;
-    }) => {
+    mutationFn: async (payload: { habitId: string; status: HabitStatus }) => {
       const paused_at =
         payload.status === "paused" ? new Date().toISOString() : null;
 

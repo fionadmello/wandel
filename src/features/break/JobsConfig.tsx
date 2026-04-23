@@ -8,9 +8,16 @@ import type { JobOption } from "@/types/setup";
 interface JobsConfigProps {
   values: JobOption[];
   onNext: (values: JobOption[]) => void;
+  habitName?: string;
+  submitLabel?: string;
 }
 
-export function JobsConfig({ values, onNext }: JobsConfigProps) {
+export function JobsConfig({
+  values,
+  onNext,
+  habitName = "smoking",
+  submitLabel = "Next",
+}: JobsConfigProps) {
   const [selected, setSelected] = useState<JobOption[]>(values);
   const [showInput, setShowInput] = useState(false);
   const [customName, setCustomName] = useState("");
@@ -66,7 +73,7 @@ export function JobsConfig({ values, onNext }: JobsConfigProps) {
     <div className="flex flex-col min-h-dvh px-8 py-12 gap-8">
       <div className="flex flex-col gap-2">
         <h2 className="font-serif italic text-[32px] leading-tight text-plum">
-          What jobs does smoking do for you?
+          What jobs does {habitName} do for you?
         </h2>
         <p className="font-sans text-xs text-muted">
           Select the ones that ring true.
@@ -190,7 +197,7 @@ export function JobsConfig({ values, onNext }: JobsConfigProps) {
       {error && <p className="font-sans text-xs text-amber">{error}</p>}
 
       <Button variant="primary" onClick={handleSubmit}>
-        Next
+        {submitLabel}
       </Button>
     </div>
   );
