@@ -1,0 +1,117 @@
+import { ArrowLeft } from "lucide-react";
+import { useRef, useState } from "react";
+
+import { ScreenWrap } from "@/components/layout/ScreenWrap";
+import { Button } from "@/components/ui/Button";
+import { useAddBreakHabit } from "@/hooks/useBreakHabits";
+import type { JobOption } from "@/types/setup";
+
+import { JobsConfig } from "./JobsConfig";
+
+interface NameStepProps {
+  onNext: (name: string) => void;
+  onCancel: () => void;
+}
+
+function NameStep({ onNext, onCancel }: NameStepProps) {
+  const [value, setValue] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleNext = () => {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      setError("Give this habit a name.");
+      return;
+    }
+    onNext(trimmed);
+  };
+
+  return (
+    <ScreenWrap padBottom={false}>
+      <div className="flex flex-col min-h-dvh px-8 py-12 gap-8">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="self-start p-1 text-muted bg-transparent border-none cursor-pointer"
+          aria-label="Cancel"
+        >
+          <ArrowLeft size={18} />
+        </button>
+
+        <div className="flex flex-col gap-2">
+          <h2 className="font-serif italic text-[32px] leading-tight text-plum">
+            What habit are you working to break?
+          </h2>
+          <p className="font-sans text-xs text-muted">Give it a name.</p>
+        </div>
+
+        <input
+          ref={inputRef}
+          type="text"
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+            setError(null);
+          }}
+          onKeyDown={(e) => e.key === "Enter" && handleNext()}
+          placeholder="e.g. Smoking"
+          className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[15px] text-plum outline-none placeholder:text-muted"
+          autoFocus
+        />
+
+        {error && <p className="font-sans text-xs text-amber">{error}</p>}
+
+        <Button variant="primary" onClick={handleNext}>
+          Next
+        </Button>
+      </div>
+    </ScreenWrap>
+  );
+}
+
+interface AddHabitFlowProps {
+  userId: string;
+  onCancel: () => void;
+  onComplete: () => void;
+}
+
+export function AddHabitFlow({
+  userId,
+  onCancel,
+  onComplete,
+}: AddHabitFlowProps) {
+  const [step, setStep] = useState(0);
+  const [habitName, setHabitName] = useState("");
+  const { mutate: addHabit, isPending, isError } = useAddBreakHabit(userId);
+
+  if (step === 0) {
+    return (
+      <NameStep
+        onNext={(name) => {
+          setHabitName(name);
+          setStep(1);
+        }}
+        onCancel={onCancel}
+      />
+    );
+  }
+
+  return (
+    <>
+      <JobsConfig
+        values={[]}
+        habitName={habitName}
+        submitLabel={isPending ? "Adding…" : "Add habit"}
+        onNext={(jobs: JobOption[]) => {
+          addHabit({ name: habitName, jobs }, { onSuccess: onComplete });
+        }}
+      />
+      {isError && (
+        <p className="font-sans text-xs text-amber px-8 pb-4">
+          Something went wrong. Please try again.
+        </p>
+      )}
+    </>
+  );
+}
