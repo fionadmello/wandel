@@ -76,7 +76,8 @@ export interface Database {
           user_id: string;
           category: "break" | "build";
           name: string;
-          is_active: boolean;
+          status: "active" | "paused" | "deactivated";
+          paused_at: string | null;
           sort_order: number;
           created_at: string;
         };
@@ -85,12 +86,14 @@ export interface Database {
           user_id: string;
           category: "break" | "build";
           name: string;
-          is_active?: boolean;
+          status?: "active" | "paused" | "deactivated";
+          paused_at?: string | null;
           sort_order?: number;
         };
         Update: {
           name?: string;
-          is_active?: boolean;
+          status?: "active" | "paused" | "deactivated";
+          paused_at?: string | null;
           sort_order?: number;
         };
         Relationships: [];
@@ -147,6 +150,7 @@ export interface Database {
           id: string;
           habit_id: string;
           user_id: string;
+          job: string | null;
           context: string | null;
           urge_intensity: number | null;
           aftermath: string | null;
@@ -156,12 +160,14 @@ export interface Database {
           id?: string;
           habit_id: string;
           user_id: string;
+          job?: string | null;
           context?: string | null;
           urge_intensity?: number | null;
           aftermath?: string | null;
           logged_at?: string;
         };
         Update: {
+          job?: string | null;
           context?: string | null;
           urge_intensity?: number | null;
           aftermath?: string | null;
@@ -239,6 +245,7 @@ export type BuildObservation =
 
 // App-level types
 export type HabitCategory = "break" | "build";
+export type HabitStatus = "active" | "paused" | "deactivated";
 
 export type MarkType = "full" | "dot" | "half";
 
