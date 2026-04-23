@@ -76,7 +76,7 @@ export interface Database {
           user_id: string;
           category: "break" | "build";
           name: string;
-          status: "active" | "paused" | "deactivated";
+          status: "active" | "scheduled" | "paused" | "deactivated";
           paused_at: string | null;
           sort_order: number;
           created_at: string;
@@ -86,13 +86,13 @@ export interface Database {
           user_id: string;
           category: "break" | "build";
           name: string;
-          status?: "active" | "paused" | "deactivated";
+          status?: "active" | "scheduled" | "paused" | "deactivated";
           paused_at?: string | null;
           sort_order?: number;
         };
         Update: {
           name?: string;
-          status?: "active" | "paused" | "deactivated";
+          status?: "active" | "scheduled" | "paused" | "deactivated";
           paused_at?: string | null;
           sort_order?: number;
         };
@@ -245,7 +245,7 @@ export type BuildObservation =
 
 // App-level types
 export type HabitCategory = "break" | "build";
-export type HabitStatus = "active" | "paused" | "deactivated";
+export type HabitStatus = "active" | "scheduled" | "paused" | "deactivated";
 
 export type MarkType = "full" | "dot" | "half";
 

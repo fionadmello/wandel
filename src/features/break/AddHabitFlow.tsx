@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { Button } from "@/components/ui/Button";
 import { useAddBreakHabit } from "@/hooks/useBreakHabits";
+import type { HabitStatus } from "@/types/database";
 import type { JobOption } from "@/types/setup";
 
 import { JobsConfig } from "./JobsConfig";
@@ -28,8 +29,8 @@ function NameStep({ onNext, onCancel }: NameStepProps) {
   };
 
   return (
-    <ScreenWrap padBottom={false}>
-      <div className="flex flex-col min-h-dvh px-8 py-12 gap-8">
+    <ScreenWrap>
+      <div className="flex flex-col px-8 py-12 gap-8">
         <button
           type="button"
           onClick={onCancel}
@@ -83,7 +84,15 @@ export function AddHabitFlow({
 }: AddHabitFlowProps) {
   const [step, setStep] = useState(0);
   const [habitName, setHabitName] = useState("");
+  const [selectedJobs, setSelectedJobs] = useState<JobOption[]>([]);
   const { mutate: addHabit, isPending, isError } = useAddBreakHabit(userId);
+
+  const save = (status: HabitStatus) => {
+    addHabit(
+      { name: habitName, jobs: selectedJobs, status },
+      { onSuccess: onComplete },
+    );
+  };
 
   if (step === 0) {
     return (
@@ -97,21 +106,74 @@ export function AddHabitFlow({
     );
   }
 
+  if (step === 1) {
+    return (
+      <ScreenWrap>
+        <JobsConfig
+          values={[]}
+          habitName={habitName}
+          submitLabel="Next"
+          onNext={(jobs) => {
+            setSelectedJobs(jobs);
+            setStep(2);
+          }}
+          onCancel={onCancel}
+        />
+      </ScreenWrap>
+    );
+  }
+
   return (
-    <>
-      <JobsConfig
-        values={[]}
-        habitName={habitName}
-        submitLabel={isPending ? "Adding…" : "Add habit"}
-        onNext={(jobs: JobOption[]) => {
-          addHabit({ name: habitName, jobs }, { onSuccess: onComplete });
-        }}
-      />
-      {isError && (
-        <p className="font-sans text-xs text-amber px-8 pb-4">
-          Something went wrong. Please try again.
-        </p>
-      )}
-    </>
+    <ScreenWrap>
+      <div className="flex flex-col px-8 py-12 gap-8">
+        <button
+          type="button"
+          onClick={() => setStep(1)}
+          className="self-start p-1 text-muted bg-transparent border-none cursor-pointer"
+          aria-label="Back"
+        >
+          <ArrowLeft size={18} />
+        </button>
+
+        <div className="flex flex-col gap-2">
+          <h2 className="font-serif italic text-[32px] leading-tight text-plum">
+            When do you want to start?
+          </h2>
+          <p className="font-sans text-xs text-muted">
+            You can always change this later.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <Button
+            variant="accent"
+            onClick={() => save("active")}
+            disabled={isPending}
+          >
+            Start now
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => save("scheduled")}
+            disabled={isPending}
+          >
+            Schedule for later
+          </Button>
+          <button
+            type="button"
+            onClick={onCancel}
+            className="font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer pt-2"
+          >
+            Cancel
+          </button>
+        </div>
+
+        {isError && (
+          <p className="font-sans text-xs text-amber">
+            Something went wrong. Please try again.
+          </p>
+        )}
+      </div>
+    </ScreenWrap>
   );
 }

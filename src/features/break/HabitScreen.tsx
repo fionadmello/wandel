@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
+import { Button } from "@/components/ui/Button";
 import { useBreakHabit } from "@/hooks/useBreakHabits";
 import {
   useResetBreakHabit,
@@ -89,6 +90,25 @@ function HabitContent({ userId, habit }: HabitContentProps) {
               updateStatus({ habitId: habit.id, status: "deactivated" })
             }
           />
+        )}
+
+        {habit.status === "scheduled" && (
+          <div className="flex flex-col gap-4 pt-2">
+            <div className="bg-card rounded-2xl border-l-[3px] border-violet px-4 py-4">
+              <p className="font-serif italic text-[15px] text-plum leading-snug">
+                This habit is scheduled but not yet active.
+              </p>
+            </div>
+            <Button
+              variant="accent"
+              onClick={() =>
+                updateStatus({ habitId: habit.id, status: "active" })
+              }
+              disabled={isPending}
+            >
+              Start tracking
+            </Button>
+          </div>
         )}
 
         {habit.status === "deactivated" && (

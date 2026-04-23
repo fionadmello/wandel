@@ -29,7 +29,7 @@ export function JobConfigPanel({
     .map((c) => ({ name: c.value, description: c.sub_type ?? "" }));
 
   return (
-    <ScreenWrap padBottom={false}>
+    <ScreenWrap>
       <div className="flex items-center gap-3 px-5 pt-[14px]">
         <button
           type="button"

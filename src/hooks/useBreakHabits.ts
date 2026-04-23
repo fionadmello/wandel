@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/lib/supabase";
-import type { Habit, HabitWithConfigs } from "@/types/database";
+import type { Habit, HabitStatus, HabitWithConfigs } from "@/types/database";
 import type { JobOption } from "@/types/setup";
 
 export function useBreakHabits(userId: string) {
@@ -44,10 +44,19 @@ export function useAddBreakHabit(userId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: { name: string; jobs: JobOption[] }) => {
+    mutationFn: async (payload: {
+      name: string;
+      jobs: JobOption[];
+      status?: HabitStatus;
+    }) => {
       const { data: habit, error: habitError } = await supabase
         .from("habits")
-        .insert({ user_id: userId, category: "break", name: payload.name })
+        .insert({
+          user_id: userId,
+          category: "break",
+          name: payload.name,
+          status: payload.status ?? "active",
+        })
         .select()
         .single();
 

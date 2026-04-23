@@ -10,6 +10,7 @@ interface JobsConfigProps {
   onNext: (values: JobOption[]) => void;
   habitName?: string;
   submitLabel?: string;
+  onCancel?: () => void;
 }
 
 export function JobsConfig({
@@ -17,6 +18,7 @@ export function JobsConfig({
   onNext,
   habitName = "smoking",
   submitLabel = "Next",
+  onCancel,
 }: JobsConfigProps) {
   const [selected, setSelected] = useState<JobOption[]>(values);
   const [showInput, setShowInput] = useState(false);
@@ -70,7 +72,7 @@ export function JobsConfig({
   const customJobs = selected.filter((j) => !defaultNames.includes(j.name));
 
   return (
-    <div className="flex flex-col min-h-dvh px-8 py-12 gap-8">
+    <div className="flex flex-col px-8 py-12 gap-8">
       <div className="flex flex-col gap-2">
         <h2 className="font-serif italic text-[32px] leading-tight text-plum">
           What jobs does {habitName} do for you?
@@ -199,6 +201,16 @@ export function JobsConfig({
       <Button variant="primary" onClick={handleSubmit}>
         {submitLabel}
       </Button>
+
+      {onCancel && (
+        <button
+          type="button"
+          onClick={onCancel}
+          className="font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer"
+        >
+          Cancel
+        </button>
+      )}
     </div>
   );
 }
