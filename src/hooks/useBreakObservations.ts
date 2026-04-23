@@ -34,6 +34,7 @@ export function useLogBreakObservation(userId: string) {
   return useMutation({
     mutationFn: async (payload: {
       habit_id: string;
+      job?: string;
       context?: string;
       urge_intensity?: number;
       emotions: string[];

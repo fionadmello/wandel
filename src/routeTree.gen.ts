@@ -17,6 +17,7 @@ import { Route as BuildRouteImport } from './routes/build'
 import { Route as BreakRouteImport } from './routes/break'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BreakHabitIdRouteImport } from './routes/break.$habitId'
 
 const SetupRoute = SetupRouteImport.update({
   id: '/setup',
@@ -58,37 +59,45 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BreakHabitIdRoute = BreakHabitIdRouteImport.update({
+  id: '/$habitId',
+  path: '/$habitId',
+  getParentRoute: () => BreakRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/break': typeof BreakRoute
+  '/break': typeof BreakRouteWithChildren
   '/build': typeof BuildRoute
   '/history': typeof HistoryRoute
   '/morning': typeof MorningRoute
   '/settings': typeof SettingsRoute
   '/setup': typeof SetupRoute
+  '/break/$habitId': typeof BreakHabitIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/break': typeof BreakRoute
+  '/break': typeof BreakRouteWithChildren
   '/build': typeof BuildRoute
   '/history': typeof HistoryRoute
   '/morning': typeof MorningRoute
   '/settings': typeof SettingsRoute
   '/setup': typeof SetupRoute
+  '/break/$habitId': typeof BreakHabitIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/break': typeof BreakRoute
+  '/break': typeof BreakRouteWithChildren
   '/build': typeof BuildRoute
   '/history': typeof HistoryRoute
   '/morning': typeof MorningRoute
   '/settings': typeof SettingsRoute
   '/setup': typeof SetupRoute
+  '/break/$habitId': typeof BreakHabitIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
     | '/morning'
     | '/settings'
     | '/setup'
+    | '/break/$habitId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
     | '/morning'
     | '/settings'
     | '/setup'
+    | '/break/$habitId'
   id:
     | '__root__'
     | '/'
@@ -121,12 +132,13 @@ export interface FileRouteTypes {
     | '/morning'
     | '/settings'
     | '/setup'
+    | '/break/$habitId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
-  BreakRoute: typeof BreakRoute
+  BreakRoute: typeof BreakRouteWithChildren
   BuildRoute: typeof BuildRoute
   HistoryRoute: typeof HistoryRoute
   MorningRoute: typeof MorningRoute
@@ -192,13 +204,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/break/$habitId': {
+      id: '/break/$habitId'
+      path: '/$habitId'
+      fullPath: '/break/$habitId'
+      preLoaderRoute: typeof BreakHabitIdRouteImport
+      parentRoute: typeof BreakRoute
+    }
   }
 }
+
+interface BreakRouteChildren {
+  BreakHabitIdRoute: typeof BreakHabitIdRoute
+}
+
+const BreakRouteChildren: BreakRouteChildren = {
+  BreakHabitIdRoute: BreakHabitIdRoute,
+}
+
+const BreakRouteWithChildren = BreakRoute._addFileChildren(BreakRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
-  BreakRoute: BreakRoute,
+  BreakRoute: BreakRouteWithChildren,
   BuildRoute: BuildRoute,
   HistoryRoute: HistoryRoute,
   MorningRoute: MorningRoute,
