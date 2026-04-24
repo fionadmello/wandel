@@ -21,9 +21,15 @@ export function useUpdateHabitStatus(userId: string) {
       if (error) throw error;
       return data as Habit;
     },
-    onSuccess: () => {
+    onSuccess: (_, { habitId }) => {
       queryClient.invalidateQueries({ queryKey: ["break_habits", userId] });
       queryClient.invalidateQueries({ queryKey: ["build_habits", userId] });
+      queryClient.invalidateQueries({
+        queryKey: ["break_habit", userId, habitId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["build_habit", userId, habitId],
+      });
     },
   });
 }
@@ -50,8 +56,11 @@ export function useResetBreakHabit(userId: string) {
       if (error) throw error;
       return data as Habit;
     },
-    onSuccess: () => {
+    onSuccess: (_, habitId) => {
       queryClient.invalidateQueries({ queryKey: ["break_habits", userId] });
+      queryClient.invalidateQueries({
+        queryKey: ["break_habit", userId, habitId],
+      });
       queryClient.invalidateQueries({
         queryKey: ["break_observations", userId],
       });
@@ -81,8 +90,11 @@ export function useResetBuildHabit(userId: string) {
       if (error) throw error;
       return data as Habit;
     },
-    onSuccess: () => {
+    onSuccess: (_, habitId) => {
       queryClient.invalidateQueries({ queryKey: ["build_habits", userId] });
+      queryClient.invalidateQueries({
+        queryKey: ["build_habit", userId, habitId],
+      });
       queryClient.invalidateQueries({
         queryKey: ["build_observations", userId],
       });
