@@ -1,10 +1,12 @@
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
+import { format } from "date-fns";
 import { Settings } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { Button } from "@/components/ui/Button";
+import { DateSelector } from "@/components/ui/DateSelector";
 import { useBreakHabit } from "@/hooks/useBreakHabits";
 import {
   useResetBreakHabit,
@@ -23,7 +25,14 @@ interface HabitContentProps {
   logDate?: string;
 }
 
-function HabitContent({ userId, habit, logDate }: HabitContentProps) {
+function HabitContent({
+  userId,
+  habit,
+  logDate: initialLogDate,
+}: HabitContentProps) {
+  const [logDate, setLogDate] = useState(
+    initialLogDate ?? format(new Date(), "yyyy-MM-dd"),
+  );
   const [showJobConfig, setShowJobConfig] = useState(false);
   const [confirmingReset, setConfirmingReset] = useState(false);
   const navigate = useNavigate();
@@ -74,12 +83,15 @@ function HabitContent({ userId, habit, logDate }: HabitContentProps) {
         </div>
 
         {habit.status === "active" && (
-          <LogForm
-            userId={userId}
-            habitId={habit.id}
-            jobConfigs={habit.configs}
-            date={logDate}
-          />
+          <>
+            <DateSelector value={logDate} onChange={setLogDate} />
+            <LogForm
+              userId={userId}
+              habitId={habit.id}
+              jobConfigs={habit.configs}
+              date={logDate}
+            />
+          </>
         )}
 
         {habit.status === "paused" && habit.paused_at && (

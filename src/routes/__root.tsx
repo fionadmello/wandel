@@ -19,6 +19,7 @@ function RootLayout() {
   const showSettings =
     !pathname.startsWith("/break") &&
     !pathname.startsWith("/build") &&
+    pathname !== "/history" &&
     pathname !== "/settings";
   const onSettings = showSettings
     ? () => navigate({ to: "/settings" })

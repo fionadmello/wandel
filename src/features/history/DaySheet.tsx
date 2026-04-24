@@ -35,9 +35,6 @@ export function DaySheet({
     parse(date, "yyyy-MM-dd", new Date()),
     "EEEE, d MMMM",
   );
-  const today = format(new Date(), "yyyy-MM-dd");
-  const isPast = date < today;
-
   const goTo = (path: string) => {
     onClose();
     navigate({ to: path as "/morning" });
@@ -149,7 +146,7 @@ export function DaySheet({
                       <p className="font-sans text-[13px] text-muted">
                         Not logged
                       </p>
-                      {!isFuture && isPast && (
+                      {!isFuture && (
                         <button
                           type="button"
                           onClick={() =>
@@ -205,7 +202,7 @@ export function DaySheet({
                       <p className="font-sans text-[13px] text-muted">
                         Not logged
                       </p>
-                      {!isFuture && isPast && (
+                      {!isFuture && (
                         <button
                           type="button"
                           onClick={() =>

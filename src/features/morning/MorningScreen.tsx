@@ -1,7 +1,9 @@
 import { useSearch } from "@tanstack/react-router";
-import { format, parse } from "date-fns";
+import { format } from "date-fns";
+import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
+import { DateSelector } from "@/components/ui/DateSelector";
 import { ReminderCard } from "@/components/ui/ReminderCard";
 import { useBreakObservations } from "@/hooks/useBreakObservations";
 import { useEngineMark } from "@/hooks/useEngineMark";
@@ -17,15 +19,12 @@ import { QualitiesCard } from "./QualitiesCard";
 
 interface MorningContentProps {
   userId: string;
-  logDate: string;
+  initialLogDate: string;
 }
 
-function MorningContent({ userId, logDate }: MorningContentProps) {
+function MorningContent({ userId, initialLogDate }: MorningContentProps) {
+  const [logDate, setLogDate] = useState(initialLogDate);
   const isToday = logDate === format(new Date(), "yyyy-MM-dd");
-  const displayDate = format(
-    parse(logDate, "yyyy-MM-dd", new Date()),
-    "EEEE, d MMMM",
-  );
 
   const profileQuery = useProfile(userId);
   const qualitiesQuery = useProfileQualities(userId);
@@ -44,9 +43,7 @@ function MorningContent({ userId, logDate }: MorningContentProps) {
     <ScreenWrap>
       <MorningDecorations />
       <div className="flex flex-col px-6 pt-6 gap-6 relative">
-        <p className="font-serif italic text-[15px] text-muted">
-          {displayDate}
-        </p>
+        <DateSelector value={logDate} onChange={setLogDate} />
 
         {reminder && <ReminderCard text={reminder} />}
 
@@ -72,7 +69,7 @@ export function MorningScreen() {
   const { session, loading } = useSession();
   const userId = session?.user.id ?? "";
   const search = useSearch({ strict: false }) as { date?: string };
-  const logDate = search.date ?? format(new Date(), "yyyy-MM-dd");
+  const initialLogDate = search.date ?? format(new Date(), "yyyy-MM-dd");
 
   if (loading || !userId) {
     return (
@@ -84,5 +81,5 @@ export function MorningScreen() {
     );
   }
 
-  return <MorningContent userId={userId} logDate={logDate} />;
+  return <MorningContent userId={userId} initialLogDate={initialLogDate} />;
 }

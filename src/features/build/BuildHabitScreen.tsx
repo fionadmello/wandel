@@ -1,8 +1,10 @@
 import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
+import { format } from "date-fns";
 import { ArrowLeft, Settings } from "lucide-react";
 import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
+import { DateSelector } from "@/components/ui/DateSelector";
 import { PausedBanner } from "@/features/break/PausedBanner";
 import { useBuildHabit } from "@/hooks/useBuildHabits";
 import {
@@ -23,7 +25,14 @@ interface BuildHabitContentProps {
   logDate?: string;
 }
 
-function BuildHabitContent({ userId, habit, logDate }: BuildHabitContentProps) {
+function BuildHabitContent({
+  userId,
+  habit,
+  logDate: initialLogDate,
+}: BuildHabitContentProps) {
+  const [logDate, setLogDate] = useState(
+    initialLogDate ?? format(new Date(), "yyyy-MM-dd"),
+  );
   const [showConfig, setShowConfig] = useState(false);
   const navigate = useNavigate();
 
@@ -73,13 +82,16 @@ function BuildHabitContent({ userId, habit, logDate }: BuildHabitContentProps) {
         </div>
 
         {habit.status === "active" && (
-          <BuildLogForm
-            userId={userId}
-            habitId={habit.id}
-            habitName={habit.name}
-            configs={habit.configs ?? []}
-            date={logDate}
-          />
+          <>
+            <DateSelector value={logDate} onChange={setLogDate} />
+            <BuildLogForm
+              userId={userId}
+              habitId={habit.id}
+              habitName={habit.name}
+              configs={habit.configs ?? []}
+              date={logDate}
+            />
+          </>
         )}
 
         {habit.status === "scheduled" && (
