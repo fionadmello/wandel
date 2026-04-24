@@ -1,5 +1,3 @@
-import { format } from "date-fns";
-
 import { Button } from "@/components/ui/Button";
 import { useUpsertEngineMark } from "@/hooks/useEngineMark";
 import { useTimer } from "@/hooks/useTimer";
@@ -9,15 +7,16 @@ import { TimerButton } from "./TimerButton";
 interface EngineSectionProps {
   userId: string;
   marked: boolean;
+  date: string;
 }
 
-export function EngineSection({ userId, marked }: EngineSectionProps) {
+export function EngineSection({ userId, marked, date }: EngineSectionProps) {
   const { state, timeLeft, timerCompletedOnce, start } = useTimer();
   const { mutate: upsertMark, isPending } = useUpsertEngineMark(userId);
 
   const handleMark = () => {
     upsertMark({
-      date: format(new Date(), "yyyy-MM-dd"),
+      date,
       timer_completed: timerCompletedOnce,
       confirmed_at: new Date().toISOString(),
     });

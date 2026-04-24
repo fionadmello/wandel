@@ -38,6 +38,7 @@ export function useLogBreakObservation(userId: string) {
       context?: string;
       urge_intensity?: number;
       emotions: string[];
+      logged_at?: string;
     }) => {
       const { emotions, ...observationPayload } = payload;
 

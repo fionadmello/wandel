@@ -1,4 +1,5 @@
-import { format } from "date-fns";
+import { useSearch } from "@tanstack/react-router";
+import { format, parse } from "date-fns";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { ReminderCard } from "@/components/ui/ReminderCard";
@@ -16,15 +17,20 @@ import { QualitiesCard } from "./QualitiesCard";
 
 interface MorningContentProps {
   userId: string;
+  logDate: string;
 }
 
-function MorningContent({ userId }: MorningContentProps) {
-  const today = format(new Date(), "yyyy-MM-dd");
+function MorningContent({ userId, logDate }: MorningContentProps) {
+  const isToday = logDate === format(new Date(), "yyyy-MM-dd");
+  const displayDate = format(
+    parse(logDate, "yyyy-MM-dd", new Date()),
+    "EEEE, d MMMM",
+  );
 
   const profileQuery = useProfile(userId);
   const qualitiesQuery = useProfileQualities(userId);
-  const engineMarkQuery = useEngineMark(userId, today);
-  const breakObsQuery = useBreakObservations(userId, today);
+  const engineMarkQuery = useEngineMark(userId, logDate);
+  const breakObsQuery = useBreakObservations(userId, logDate);
   const buildObsQuery = useTodayBuildObservations(userId);
 
   const reminder = useReminderRotation(userId);
@@ -39,7 +45,7 @@ function MorningContent({ userId }: MorningContentProps) {
       <MorningDecorations />
       <div className="flex flex-col px-6 pt-6 gap-6 relative">
         <p className="font-serif italic text-[15px] text-muted">
-          {format(new Date(), "EEEE, d MMMM")}
+          {displayDate}
         </p>
 
         {reminder && <ReminderCard text={reminder} />}
@@ -52,9 +58,9 @@ function MorningContent({ userId }: MorningContentProps) {
 
         <QualitiesCard qualities={qualities} />
 
-        <EngineSection userId={userId} marked={marked} />
+        <EngineSection userId={userId} marked={marked} date={logDate} />
 
-        {(smokingCount > 0 || hasExercise) && (
+        {isToday && (smokingCount > 0 || hasExercise) && (
           <AtAGlance smokingCount={smokingCount} hasExercise={hasExercise} />
         )}
       </div>
@@ -65,6 +71,8 @@ function MorningContent({ userId }: MorningContentProps) {
 export function MorningScreen() {
   const { session, loading } = useSession();
   const userId = session?.user.id ?? "";
+  const search = useSearch({ strict: false }) as { date?: string };
+  const logDate = search.date ?? format(new Date(), "yyyy-MM-dd");
 
   if (loading || !userId) {
     return (
@@ -76,5 +84,5 @@ export function MorningScreen() {
     );
   }
 
-  return <MorningContent userId={userId} />;
+  return <MorningContent userId={userId} logDate={logDate} />;
 }

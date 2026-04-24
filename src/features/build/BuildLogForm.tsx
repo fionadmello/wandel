@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/Label";
 import { MarkIndicator } from "@/components/ui/MarkIndicator";
 import { MARKS } from "@/constants/marks";
 import {
-  useHabitTodayObservations,
+  useHabitDayObservations,
   useUpsertBuildObservation,
 } from "@/hooks/useBuildObservations";
 import type { HabitConfig, MarkType } from "@/types/database";
@@ -40,6 +40,7 @@ interface MarkFormProps {
   habitId: string;
   habitName: string;
   userId: string;
+  date?: string;
   onLogged?: () => void;
 }
 
@@ -51,6 +52,7 @@ function MarkForm({
   habitId,
   habitName,
   userId,
+  date,
   onLogged,
 }: MarkFormProps) {
   const [selectedMark, setSelectedMark] = useState<MarkType | null>(
@@ -61,7 +63,7 @@ function MarkForm({
   const { mutate: upsert, isPending } = useUpsertBuildObservation(userId);
 
   const anchor = getConfigValue(configs, "anchor", subType);
-  const today = format(new Date(), "yyyy-MM-dd");
+  const logDate = date ?? format(new Date(), "yyyy-MM-dd");
 
   const handleLog = () => {
     setSubmitted(true);
@@ -71,7 +73,7 @@ function MarkForm({
     upsert(
       {
         habit_id: habitId,
-        date: today,
+        date: logDate,
         sub_type: subType ?? undefined,
         mark_type: selectedMark,
         mark_label: markDef.label,
@@ -156,6 +158,7 @@ interface BuildLogFormProps {
   habitId: string;
   habitName: string;
   configs: HabitConfig[];
+  date?: string;
 }
 
 export function BuildLogForm({
@@ -163,16 +166,15 @@ export function BuildLogForm({
   habitId,
   habitName,
   configs,
+  date,
 }: BuildLogFormProps) {
   const safeConfigs = configs ?? [];
   const subTypes = getSubTypes(safeConfigs);
   const hasSubTypes = subTypes.length > 0;
 
-  const [selectedSubType, setSelectedSubType] = useState<string | null>(
-    hasSubTypes ? null : null,
-  );
+  const [selectedSubType, setSelectedSubType] = useState<string | null>(null);
 
-  const todayObsQuery = useHabitTodayObservations(userId, habitId);
+  const todayObsQuery = useHabitDayObservations(userId, habitId, date);
   const todayObs = todayObsQuery.data ?? [];
 
   const findObs = (subType: string | null) =>
@@ -217,6 +219,7 @@ export function BuildLogForm({
             habitId={habitId}
             habitName={habitName}
             userId={userId}
+            date={date}
             onLogged={() => setSelectedSubType(null)}
           />
         )}
@@ -235,6 +238,7 @@ export function BuildLogForm({
       habitId={habitId}
       habitName={habitName}
       userId={userId}
+      date={date}
     />
   );
 }

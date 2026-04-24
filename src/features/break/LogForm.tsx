@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { Check } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -77,9 +78,11 @@ interface LogFormProps {
   userId: string;
   habitId: string;
   jobConfigs: HabitConfig[];
+  date?: string;
 }
 
-export function LogForm({ userId, habitId, jobConfigs }: LogFormProps) {
+export function LogForm({ userId, habitId, jobConfigs, date }: LogFormProps) {
+  const logDate = date ?? format(new Date(), "yyyy-MM-dd");
   const [phase, setPhase] = useState<LogPhase>("form");
   const [context, setContext] = useState("");
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
@@ -114,6 +117,9 @@ export function LogForm({ userId, habitId, jobConfigs }: LogFormProps) {
     setSubmitted(true);
     if (!selectedJob || selectedEmotions.length === 0) return;
 
+    const today = format(new Date(), "yyyy-MM-dd");
+    const isRetroactive = logDate !== today;
+
     logObservation(
       {
         habit_id: habitId,
@@ -121,6 +127,9 @@ export function LogForm({ userId, habitId, jobConfigs }: LogFormProps) {
         context: context.trim() || undefined,
         urge_intensity: urge,
         emotions: selectedEmotions,
+        logged_at: isRetroactive
+          ? new Date(`${logDate}T12:00:00.000Z`).toISOString()
+          : undefined,
       },
       {
         onSuccess: (obs) => {

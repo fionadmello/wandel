@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
 import { ArrowLeft, Settings } from "lucide-react";
 import { useState } from "react";
 
@@ -20,9 +20,10 @@ import { ScheduledState } from "./ScheduledState";
 interface BuildHabitContentProps {
   userId: string;
   habit: HabitWithConfigs;
+  logDate?: string;
 }
 
-function BuildHabitContent({ userId, habit }: BuildHabitContentProps) {
+function BuildHabitContent({ userId, habit, logDate }: BuildHabitContentProps) {
   const [showConfig, setShowConfig] = useState(false);
   const navigate = useNavigate();
 
@@ -77,6 +78,7 @@ function BuildHabitContent({ userId, habit }: BuildHabitContentProps) {
             habitId={habit.id}
             habitName={habit.name}
             configs={habit.configs ?? []}
+            date={logDate}
           />
         )}
 
@@ -116,6 +118,7 @@ function BuildHabitContent({ userId, habit }: BuildHabitContentProps) {
 
 export function BuildHabitScreen() {
   const { habitId } = useParams({ strict: false });
+  const search = useSearch({ strict: false }) as { date?: string };
   const { session, loading } = useSession();
   const userId = session?.user.id ?? "";
   const habitQuery = useBuildHabit(userId, habitId ?? "");
@@ -140,5 +143,11 @@ export function BuildHabitScreen() {
     );
   }
 
-  return <BuildHabitContent userId={userId} habit={habitQuery.data} />;
+  return (
+    <BuildHabitContent
+      userId={userId}
+      habit={habitQuery.data}
+      logDate={search.date}
+    />
+  );
 }

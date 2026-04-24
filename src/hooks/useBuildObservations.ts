@@ -27,17 +27,21 @@ export function useBuildObservation(
   });
 }
 
-export function useHabitTodayObservations(userId: string, habitId: string) {
-  const today = format(new Date(), "yyyy-MM-dd");
+export function useHabitDayObservations(
+  userId: string,
+  habitId: string,
+  date?: string,
+) {
+  const effectiveDate = date ?? format(new Date(), "yyyy-MM-dd");
   return useQuery({
-    queryKey: ["build_observations_today", userId, habitId, today],
+    queryKey: ["build_observations_day", userId, habitId, effectiveDate],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("build_observations")
         .select("*")
         .eq("user_id", userId)
         .eq("habit_id", habitId)
-        .eq("date", today);
+        .eq("date", effectiveDate);
 
       if (error) throw error;
       return data as BuildObservation[];
