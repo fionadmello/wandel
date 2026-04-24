@@ -18,6 +18,9 @@ export function DeactivatedState({
       <p className="font-serif italic text-[18px] text-muted leading-snug">
         This habit has been deactivated.
       </p>
+      <p className="font-sans text-[12px] text-muted">
+        Your past observations are still visible in the History tab.
+      </p>
 
       {confirming ? (
         <div className="flex flex-col gap-2">

@@ -118,6 +118,9 @@ function HabitContent({ userId, habit }: HabitContentProps) {
             <p className="font-serif italic text-[18px] text-muted leading-snug">
               This habit has been deactivated.
             </p>
+            <p className="font-sans text-[12px] text-muted">
+              Your past observations are still visible in the History tab.
+            </p>
             {confirmingReset ? (
               <div className="flex flex-col gap-2">
                 <p className="font-sans text-[13px] text-plum">
