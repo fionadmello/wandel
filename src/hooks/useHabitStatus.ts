@@ -23,6 +23,7 @@ export function useUpdateHabitStatus(userId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["break_habits", userId] });
+      queryClient.invalidateQueries({ queryKey: ["build_habits", userId] });
     },
   });
 }
@@ -53,6 +54,37 @@ export function useResetBreakHabit(userId: string) {
       queryClient.invalidateQueries({ queryKey: ["break_habits", userId] });
       queryClient.invalidateQueries({
         queryKey: ["break_observations", userId],
+      });
+    },
+  });
+}
+
+export function useResetBuildHabit(userId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (habitId: string) => {
+      const { error: deleteError } = await supabase
+        .from("build_observations")
+        .delete()
+        .eq("habit_id", habitId);
+
+      if (deleteError) throw deleteError;
+
+      const { data, error } = await supabase
+        .from("habits")
+        .update({ status: "active", paused_at: null })
+        .eq("id", habitId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as Habit;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["build_habits", userId] });
+      queryClient.invalidateQueries({
+        queryKey: ["build_observations", userId],
       });
     },
   });

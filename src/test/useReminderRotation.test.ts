@@ -1,17 +1,17 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useReminderRotation } from "./useReminderRotation";
+import { useReminderRotation } from "@/hooks/useReminderRotation";
 
 const mockUpdateProfile = vi.fn();
 
-vi.mock("./useProfile", () => ({
+vi.mock("@/hooks/useProfile", () => ({
   useProfile: vi.fn(),
   useProfileReminders: vi.fn(),
   useUpdateProfile: vi.fn(() => ({ mutate: mockUpdateProfile })),
 }));
 
-import { useProfile, useProfileReminders } from "./useProfile";
+import { useProfile, useProfileReminders } from "@/hooks/useProfile";
 
 const TODAY = "2026-04-23";
 

@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useAddBreakHabit, useBreakHabits } from "./useBreakHabits";
+import { useAddBreakHabit, useBreakHabits } from "@/hooks/useBreakHabits";
 
 const { mockOrder, mockHabitSingle, mockConfigInsert } = vi.hoisted(() => ({
   mockOrder: vi.fn(),

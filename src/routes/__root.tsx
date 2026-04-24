@@ -17,7 +17,9 @@ function RootLayout() {
   const navigate = useNavigate();
   const hideChrome = CHROME_HIDDEN_ROUTES.includes(pathname);
   const showSettings =
-    !pathname.startsWith("/break") && pathname !== "/settings";
+    !pathname.startsWith("/break") &&
+    !pathname.startsWith("/build") &&
+    pathname !== "/settings";
   const onSettings = showSettings
     ? () => navigate({ to: "/settings" })
     : undefined;

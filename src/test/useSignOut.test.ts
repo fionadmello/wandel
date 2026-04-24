@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useSignOut } from "./useSignOut";
+import { useSignOut } from "@/hooks/useSignOut";
 
 const { mockSignOut } = vi.hoisted(() => ({
   mockSignOut: vi.fn(),

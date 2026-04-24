@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useCompleteSetup } from "./useCompleteSetup";
+import { useCompleteSetup } from "@/hooks/useCompleteSetup";
 
 const { mockUpdate, mockInsert, mockGetUser } = vi.hoisted(() => ({
   mockUpdate: vi.fn(),

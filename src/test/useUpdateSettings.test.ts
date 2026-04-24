@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useUpdateSettings } from "./useUpdateSettings";
+import { useUpdateSettings } from "@/hooks/useUpdateSettings";
 
 const { mockUpdateEq, mockDeleteEq, mockInsert } = vi.hoisted(() => ({
   mockUpdateEq: vi.fn(),

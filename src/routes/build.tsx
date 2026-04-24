@@ -1,7 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-
-import { BuildScreen } from "@/features/build/BuildScreen";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/build")({
-  component: BuildScreen,
+  component: Outlet,
 });
