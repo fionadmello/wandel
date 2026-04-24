@@ -48,7 +48,7 @@ export function useMonthBreakObservations(
     queryFn: async () => {
       const { data, error } = await supabase
         .from("break_observations")
-        .select("*, break_observation_emotions(*)")
+        .select("*, emotions:break_observation_emotions(*)")
         .eq("user_id", userId)
         .gte("logged_at", `${first}T00:00:00.000Z`)
         .lte("logged_at", `${last}T23:59:59.999Z`)
