@@ -10,7 +10,7 @@ import {
   useUpdateBuildSubType,
 } from "@/hooks/useBuildHabits";
 import { useUpdateHabitStatus } from "@/hooks/useHabitStatus";
-import type { HabitConfig } from "@/types/database";
+import type { HabitConfig, HabitStatus } from "@/types/database";
 
 import { ExerciseConfigStep } from "./ExerciseConfigStep";
 
@@ -46,6 +46,7 @@ interface BuildConfigPanelProps {
   habitId: string;
   habitName: string;
   configs: HabitConfig[];
+  status: HabitStatus;
   onClose: () => void;
 }
 
@@ -54,6 +55,7 @@ export function BuildConfigPanel({
   habitId,
   habitName,
   configs,
+  status,
   onClose,
 }: BuildConfigPanelProps) {
   const safeConfigs = configs ?? [];
@@ -226,50 +228,54 @@ export function BuildConfigPanel({
           </Button>
         )}
 
-        <Divider className="my-0" />
+        {(status === "active" || status === "scheduled") && (
+          <>
+            <Divider className="my-0" />
 
-        {confirming ? (
-          <div className="flex flex-col gap-3">
-            <p className="font-sans text-[13px] text-plum">
-              {confirming === "pause"
-                ? "Pause this habit?"
-                : "Deactivate this habit?"}
-            </p>
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={confirmAction}
-                disabled={isUpdatingStatus}
-                className="font-sans text-[13px] font-medium text-amber bg-transparent border-none cursor-pointer"
-              >
-                {isUpdatingStatus ? "…" : "Confirm"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setConfirming(null)}
-                className="font-sans text-[13px] text-muted bg-transparent border-none cursor-pointer"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={() => setConfirming("pause")}
-              className="font-sans text-[13px] text-muted text-left bg-transparent border-none cursor-pointer"
-            >
-              Pause habit
-            </button>
-            <button
-              type="button"
-              onClick={() => setConfirming("deactivate")}
-              className="font-sans text-[13px] text-amber text-left bg-transparent border-none cursor-pointer"
-            >
-              Deactivate habit
-            </button>
-          </div>
+            {confirming ? (
+              <div className="flex flex-col gap-3">
+                <p className="font-sans text-[13px] text-plum">
+                  {confirming === "pause"
+                    ? "Pause this habit?"
+                    : "Deactivate this habit?"}
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={confirmAction}
+                    disabled={isUpdatingStatus}
+                    className="font-sans text-[13px] font-medium text-amber bg-transparent border-none cursor-pointer"
+                  >
+                    {isUpdatingStatus ? "…" : "Confirm"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirming(null)}
+                    className="font-sans text-[13px] text-muted bg-transparent border-none cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={() => setConfirming("pause")}
+                  className="font-sans text-[13px] text-muted text-left bg-transparent border-none cursor-pointer"
+                >
+                  Pause habit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirming("deactivate")}
+                  className="font-sans text-[13px] text-amber text-left bg-transparent border-none cursor-pointer"
+                >
+                  Deactivate habit
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </ScreenWrap>

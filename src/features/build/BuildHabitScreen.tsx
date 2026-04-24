@@ -40,6 +40,7 @@ function BuildHabitContent({ userId, habit }: BuildHabitContentProps) {
         habitId={habit.id}
         habitName={habit.name}
         configs={habit.configs ?? []}
+        status={habit.status}
         onClose={() => setShowConfig(false)}
       />
     );
@@ -102,7 +103,12 @@ function BuildHabitContent({ userId, habit }: BuildHabitContentProps) {
           />
         )}
 
-        {habit.status === "deactivated" && <DeactivatedState />}
+        {habit.status === "deactivated" && (
+          <DeactivatedState
+            isPending={isPending}
+            onReset={() => resetHabit(habit.id)}
+          />
+        )}
       </div>
     </ScreenWrap>
   );
