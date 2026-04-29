@@ -60,6 +60,10 @@
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+@utility pt-safe-bar {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 14px);
+}
+
 @layer components {
   .urge-slider {
     -webkit-appearance: none;

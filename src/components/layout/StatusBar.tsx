@@ -4,7 +4,7 @@ interface StatusBarProps {
 
 export function StatusBar({ onSettings }: StatusBarProps) {
   return (
-    <header className="flex justify-between items-center px-5 pt-[14px]">
+    <header className="flex justify-between items-center px-5 pt-safe-bar">
       <span className="font-sans font-light text-[11px] text-muted tracking-[0.15em] lowercase">
         wandel
       </span>
