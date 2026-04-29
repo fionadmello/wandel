@@ -1,27 +1,27 @@
 # Wandel
 
-> *From the German word for change.*
+> _From the German word for change._
 
-Wandel is a personal self-improvement mobile web app built around three interlocking daily habits:
+Wandel is a personal self-improvement mobile web app built around three interlocking daily practices:
 
-- **Mirror** — a 20-second daily mirror practice with self-affirmations
-- **Break** — logging and understanding a smoking habit
-- **Build** — building a consistent exercise habit (Yoga + Gym)
+- **Mirror** — a 20-second daily mirror practice to tend to your self-care engine
+- **Break** — log and understand any habit you want to break, capturing context, emotional state, and urge intensity
+- **Build** — build any habit you want to sustain, with a tiered effort model (non-negotiable → minimum version → full session) and support for variations within a habit
 
 ---
 
 ## Tech Stack
 
-| Layer | Library |
-|---|---|
-| UI | Vite + React + TypeScript |
-| Routing | TanStack Router |
-| Server state | TanStack Query |
-| Backend / DB | Supabase |
-| Styling | Tailwind CSS |
-| Forms | React Hook Form + Zod |
-| Icons | Lucide React |
-| PWA | vite-plugin-pwa |
+| Layer        | Library                   |
+| ------------ | ------------------------- |
+| UI           | Vite + React + TypeScript |
+| Routing      | TanStack Router           |
+| Server state | TanStack Query            |
+| Backend / DB | Supabase                  |
+| Styling      | Tailwind CSS              |
+| Validation   | Zod                       |
+| Icons        | Lucide React              |
+| PWA          | vite-plugin-pwa           |
 
 ---
 
@@ -29,14 +29,20 @@ Wandel is a personal self-improvement mobile web app built around three interloc
 
 ```bash
 # Install dependencies
-npm install
+bun install
 
 # Add environment variables
 cp .env.example .env.local
 # Fill in VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY
 
 # Start dev server
-npm run dev
+bun run dev
+
+# Run tests
+bun run test
+
+# Build
+bun run build
 ```
 
 ---
