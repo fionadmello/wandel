@@ -35,7 +35,12 @@ export function CalendarGrid({
 
   const markDates = new Set(engineMarks.map((m) => m.date));
   const smokingDates = new Set(breakObs.map((o) => o.logged_at.slice(0, 10)));
-  const exerciseDates = new Set(buildObs.map((o) => o.date));
+  const exerciseDates = new Set(
+    buildObs.filter((o) => o.mark_type !== "slip").map((o) => o.date),
+  );
+  const slipDates = new Set(
+    buildObs.filter((o) => o.mark_type === "slip").map((o) => o.date),
+  );
 
   return (
     <div className="flex flex-col gap-1 px-4">
@@ -61,6 +66,7 @@ export function CalendarGrid({
                 hasMirror={markDates.has(cell.date)}
                 hasSmoking={smokingDates.has(cell.date)}
                 hasExercise={exerciseDates.has(cell.date)}
+                hasSlip={slipDates.has(cell.date)}
                 isFuture={
                   year > currentYear ||
                   (year === currentYear &&

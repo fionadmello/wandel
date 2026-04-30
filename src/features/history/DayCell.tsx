@@ -6,6 +6,7 @@ interface DayCellProps {
   hasMirror: boolean;
   hasSmoking: boolean;
   hasExercise: boolean;
+  hasSlip: boolean;
   isFuture: boolean;
   onTap: () => void;
 }
@@ -16,10 +17,11 @@ export function DayCell({
   hasMirror,
   hasSmoking,
   hasExercise,
+  hasSlip,
   isFuture,
   onTap,
 }: DayCellProps) {
-  const hasData = hasMirror || hasSmoking || hasExercise;
+  const hasData = hasMirror || hasSmoking || hasExercise || hasSlip;
   const today = format(new Date(), "yyyy-MM-dd");
   const isActualToday = date === today;
 
@@ -48,6 +50,7 @@ export function DayCell({
         {hasExercise && (
           <span className="w-[5px] h-[5px] rounded-full bg-amber" />
         )}
+        {hasSlip && <span className="w-[5px] h-[5px] rounded-full bg-slip" />}
       </div>
     </button>
   );

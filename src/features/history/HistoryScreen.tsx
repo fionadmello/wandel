@@ -83,6 +83,25 @@ function HistoryContent({ userId }: HistoryContentProps) {
         onDayTap={setSelectedDate}
       />
 
+      <div className="flex items-center justify-center gap-4 px-4 pt-2 pb-1">
+        <div className="flex items-center gap-1.5">
+          <span className="w-[5px] h-[5px] rounded-full bg-violet" />
+          <span className="font-sans text-[10px] text-muted">Mirror</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-[5px] h-[5px] rounded-full bg-teal" />
+          <span className="font-sans text-[10px] text-muted">Break</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-[5px] h-[5px] rounded-full bg-amber" />
+          <span className="font-sans text-[10px] text-muted">Build</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-[5px] h-[5px] rounded-full bg-slip" />
+          <span className="font-sans text-[10px] text-muted">Slip</span>
+        </div>
+      </div>
+
       {selectedDate && (
         <DaySheet
           date={selectedDate}
