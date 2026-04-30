@@ -3,7 +3,7 @@ export interface JobOption {
   description: string;
 }
 
-export interface ExerciseConfig {
+export interface VariationConfig {
   name: string;
   anchor: string;
   nonNegotiable: string;

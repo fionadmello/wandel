@@ -4,9 +4,9 @@ interface DayCellProps {
   date: string;
   day: number;
   hasMirror: boolean;
-  hasSmoking: boolean;
-  hasExercise: boolean;
-  hasSlip: boolean;
+  breakCount: number;
+  buildCount: number;
+  slipCount: number;
   isFuture: boolean;
   onTap: () => void;
 }
@@ -15,13 +15,14 @@ export function DayCell({
   date,
   day,
   hasMirror,
-  hasSmoking,
-  hasExercise,
-  hasSlip,
+  breakCount,
+  buildCount,
+  slipCount,
   isFuture,
   onTap,
 }: DayCellProps) {
-  const hasData = hasMirror || hasSmoking || hasExercise || hasSlip;
+  const hasData =
+    hasMirror || breakCount > 0 || buildCount > 0 || slipCount > 0;
   const today = format(new Date(), "yyyy-MM-dd");
   const isActualToday = date === today;
 
@@ -40,17 +41,19 @@ export function DayCell({
       >
         {day}
       </span>
-      <div className="flex gap-[3px]">
+      <div className="flex flex-wrap justify-center gap-[3px]">
         {hasMirror && (
           <span className="w-[5px] h-[5px] rounded-full bg-violet" />
         )}
-        {hasSmoking && (
-          <span className="w-[5px] h-[5px] rounded-full bg-teal" />
-        )}
-        {hasExercise && (
-          <span className="w-[5px] h-[5px] rounded-full bg-amber" />
-        )}
-        {hasSlip && <span className="w-[5px] h-[5px] rounded-full bg-slip" />}
+        {Array.from({ length: breakCount }).map((_, i) => (
+          <span key={i} className="w-[5px] h-[5px] rounded-full bg-teal" />
+        ))}
+        {Array.from({ length: buildCount }).map((_, i) => (
+          <span key={i} className="w-[5px] h-[5px] rounded-full bg-amber" />
+        ))}
+        {Array.from({ length: slipCount }).map((_, i) => (
+          <span key={i} className="w-[5px] h-[5px] rounded-full bg-slip" />
+        ))}
       </div>
     </button>
   );

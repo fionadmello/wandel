@@ -12,7 +12,7 @@ import {
 import { useUpdateHabitStatus } from "@/hooks/useHabitStatus";
 import type { HabitConfig, HabitStatus } from "@/types/database";
 
-import { ExerciseConfigStep } from "./ExerciseConfigStep";
+import { VariationConfigStep } from "./VariationConfigStep";
 
 type PanelView =
   | { mode: "list" }
@@ -105,7 +105,7 @@ export function BuildConfigPanel({
           </p>
         </div>
 
-        <ExerciseConfigStep
+        <VariationConfigStep
           habitName={st ?? habitName}
           initialValues={{
             anchor: get("anchor", st),
@@ -161,7 +161,7 @@ export function BuildConfigPanel({
           </p>
         </div>
 
-        <ExerciseConfigStep
+        <VariationConfigStep
           habitName={habitName}
           submitLabel={isAdding ? "Adding…" : "Add variation"}
           onNext={(values) => {

@@ -3,28 +3,28 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
 
-interface ExerciseValues {
+interface VariationValues {
   anchor: string;
   nonNegotiable: string;
   minimumVersion: string;
   fullVersion: string;
 }
 
-interface ExerciseConfigStepProps {
+interface VariationConfigStepProps {
   habitName: string;
-  initialValues?: Partial<ExerciseValues>;
+  initialValues?: Partial<VariationValues>;
   submitLabel?: string;
-  onNext: (values: ExerciseValues) => void;
+  onNext: (values: VariationValues) => void;
   onCancel?: () => void;
 }
 
-export function ExerciseConfigStep({
+export function VariationConfigStep({
   habitName,
   initialValues = {},
   submitLabel = "Next",
   onNext,
   onCancel,
-}: ExerciseConfigStepProps) {
+}: VariationConfigStepProps) {
   const [anchor, setAnchor] = useState(initialValues.anchor ?? "");
   const [nonNegotiable, setNonNegotiable] = useState(
     initialValues.nonNegotiable ?? "",

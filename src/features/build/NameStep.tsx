@@ -51,7 +51,7 @@ export function NameStep({ onNext, onCancel }: NameStepProps) {
             setError(null);
           }}
           onKeyDown={(e) => e.key === "Enter" && handleNext()}
-          placeholder="e.g. Exercise"
+          placeholder="e.g. Running"
           className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[15px] text-plum outline-none placeholder:text-muted"
           autoFocus
         />

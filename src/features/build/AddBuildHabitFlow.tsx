@@ -5,10 +5,10 @@ import type { SubTypeConfig } from "@/hooks/useBuildHabits";
 import { useAddBuildHabit } from "@/hooks/useBuildHabits";
 import type { HabitStatus } from "@/types/database";
 
-import { ExerciseConfigStep } from "./ExerciseConfigStep";
 import { NameStep } from "./NameStep";
 import { StatusStep } from "./StatusStep";
 import { SubTypeStep } from "./SubTypeStep";
+import { VariationConfigStep } from "./VariationConfigStep";
 
 interface AddBuildHabitFlowProps {
   userId: string;
@@ -69,7 +69,7 @@ export function AddBuildHabitFlow({
   if (step === 2) {
     return (
       <ScreenWrap>
-        <ExerciseConfigStep
+        <VariationConfigStep
           habitName={habitName}
           submitLabel="Next"
           onNext={(values) => {

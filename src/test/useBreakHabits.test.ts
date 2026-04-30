@@ -38,7 +38,7 @@ function makeHabit(overrides = {}) {
     id: "habit-1",
     user_id: "user-1",
     category: "break" as const,
-    name: "Smoking",
+    name: "My habit",
     status: "active" as const,
     paused_at: null,
     sort_order: 0,
@@ -109,7 +109,7 @@ describe("useAddBreakHabit", () => {
     });
 
     await act(async () => {
-      result.current.mutate({ name: "Smoking", jobs: JOBS });
+      result.current.mutate({ name: "My habit", jobs: JOBS });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -133,7 +133,7 @@ describe("useAddBreakHabit", () => {
     });
 
     await act(async () => {
-      result.current.mutate({ name: "Smoking", jobs: [] });
+      result.current.mutate({ name: "My habit", jobs: [] });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -151,7 +151,7 @@ describe("useAddBreakHabit", () => {
     });
 
     await act(async () => {
-      result.current.mutate({ name: "Smoking", jobs: JOBS });
+      result.current.mutate({ name: "My habit", jobs: JOBS });
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));

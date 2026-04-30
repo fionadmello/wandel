@@ -34,7 +34,7 @@ const HABIT = {
   id: "habit-1",
   user_id: "user-1",
   category: "break" as const,
-  name: "Smoking",
+  name: "My habit",
   status: "active" as const,
   paused_at: null,
   sort_order: 0,

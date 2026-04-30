@@ -105,7 +105,7 @@ describe("useAddBuildHabit", () => {
     });
 
     await act(async () => {
-      result.current.mutate({ name: "Exercise", configs: CONFIGS });
+      result.current.mutate({ name: "My habit", configs: CONFIGS });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -152,7 +152,7 @@ describe("useAddBuildHabit", () => {
     });
 
     await act(async () => {
-      result.current.mutate({ name: "Exercise", configs: CONFIGS });
+      result.current.mutate({ name: "My habit", configs: CONFIGS });
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));

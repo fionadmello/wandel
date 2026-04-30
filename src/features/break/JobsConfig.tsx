@@ -16,7 +16,7 @@ interface JobsConfigProps {
 export function JobsConfig({
   values,
   onNext,
-  habitName = "smoking",
+  habitName = "this habit",
   submitLabel = "Next",
   onCancel,
 }: JobsConfigProps) {

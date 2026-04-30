@@ -34,13 +34,31 @@ export function CalendarGrid({
   const currentMonth = new Date().getMonth() + 1;
 
   const markDates = new Set(engineMarks.map((m) => m.date));
-  const smokingDates = new Set(breakObs.map((o) => o.logged_at.slice(0, 10)));
-  const exerciseDates = new Set(
-    buildObs.filter((o) => o.mark_type !== "slip").map((o) => o.date),
-  );
-  const slipDates = new Set(
-    buildObs.filter((o) => o.mark_type === "slip").map((o) => o.date),
-  );
+
+  const breakHabitsByDate = new Map<string, Set<string>>();
+  breakObs.forEach((o) => {
+    const date = o.logged_at.slice(0, 10);
+    if (!breakHabitsByDate.has(date)) breakHabitsByDate.set(date, new Set());
+    breakHabitsByDate.get(date)!.add(o.habit_id);
+  });
+
+  const buildHabitsByDate = new Map<string, Set<string>>();
+  buildObs
+    .filter((o) => o.mark_type !== "slip")
+    .forEach((o) => {
+      if (!buildHabitsByDate.has(o.date))
+        buildHabitsByDate.set(o.date, new Set());
+      buildHabitsByDate.get(o.date)!.add(o.habit_id);
+    });
+
+  const slipHabitsByDate = new Map<string, Set<string>>();
+  buildObs
+    .filter((o) => o.mark_type === "slip")
+    .forEach((o) => {
+      if (!slipHabitsByDate.has(o.date))
+        slipHabitsByDate.set(o.date, new Set());
+      slipHabitsByDate.get(o.date)!.add(o.habit_id);
+    });
 
   return (
     <div className="flex flex-col gap-1 px-4">
@@ -64,9 +82,9 @@ export function CalendarGrid({
                 date={cell.date}
                 day={cell.day}
                 hasMirror={markDates.has(cell.date)}
-                hasSmoking={smokingDates.has(cell.date)}
-                hasExercise={exerciseDates.has(cell.date)}
-                hasSlip={slipDates.has(cell.date)}
+                breakCount={breakHabitsByDate.get(cell.date)?.size ?? 0}
+                buildCount={buildHabitsByDate.get(cell.date)?.size ?? 0}
+                slipCount={slipHabitsByDate.get(cell.date)?.size ?? 0}
                 isFuture={
                   year > currentYear ||
                   (year === currentYear &&

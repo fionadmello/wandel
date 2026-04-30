@@ -1,16 +1,19 @@
 import { Button } from "@/components/ui/Button";
-import type { ExerciseConfig as ExerciseConfigType } from "@/types/setup";
+import type { VariationConfig } from "@/types/setup";
 
-interface ExerciseConfigProps {
-  values: ExerciseConfigType[];
-  onNext: (values: ExerciseConfigType[]) => void;
+interface BuildVariationConfigProps {
+  values: VariationConfig[];
+  onNext: (values: VariationConfig[]) => void;
 }
 
-export function ExerciseConfig({ values, onNext }: ExerciseConfigProps) {
+export function BuildVariationConfig({
+  values,
+  onNext,
+}: BuildVariationConfigProps) {
   return (
     <div className="flex flex-col justify-center min-h-dvh px-8 gap-6">
       <p className="font-sans text-sm text-muted">
-        Exercise config — coming soon
+        Variation config — coming soon
       </p>
       <Button variant="primary" onClick={() => onNext(values)}>
         Next

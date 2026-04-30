@@ -36,8 +36,8 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
   const marked = !!engineMarkQuery.data;
   const whyStatement = profileQuery.data?.why_statement ?? "";
   const qualities = qualitiesQuery.data ?? [];
-  const smokingCount = breakObsQuery.data?.length ?? 0;
-  const hasExercise = (buildObsQuery.data?.length ?? 0) > 0;
+  const breakObsCount = breakObsQuery.data?.length ?? 0;
+  const hasBuildObs = (buildObsQuery.data?.length ?? 0) > 0;
 
   return (
     <ScreenWrap>
@@ -57,8 +57,8 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
 
         <EngineSection userId={userId} marked={marked} date={logDate} />
 
-        {isToday && (smokingCount > 0 || hasExercise) && (
-          <AtAGlance smokingCount={smokingCount} hasExercise={hasExercise} />
+        {isToday && (breakObsCount > 0 || hasBuildObs) && (
+          <AtAGlance breakObsCount={breakObsCount} hasBuildObs={hasBuildObs} />
         )}
       </div>
     </ScreenWrap>
