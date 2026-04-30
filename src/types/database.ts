@@ -198,7 +198,7 @@ export interface Database {
           user_id: string;
           date: string;
           sub_type: string | null;
-          mark_type: "full" | "dot" | "half";
+          mark_type: "full" | "dot" | "half" | "slip";
           mark_label: string;
           note: string | null;
           logged_at: string;
@@ -209,16 +209,175 @@ export interface Database {
           user_id: string;
           date: string;
           sub_type?: string | null;
-          mark_type: "full" | "dot" | "half";
+          mark_type: "full" | "dot" | "half" | "slip";
           mark_label: string;
           note?: string | null;
           logged_at?: string;
         };
         Update: {
           sub_type?: string | null;
-          mark_type?: "full" | "dot" | "half";
+          mark_type?: "full" | "dot" | "half" | "slip";
           mark_label?: string;
           note?: string | null;
+        };
+        Relationships: [];
+      };
+      standing_up_log: {
+        Row: {
+          id: string;
+          user_id: string;
+          habit_id: string | null;
+          track_type: "engine" | "break" | "build";
+          track_name: string;
+          fall_date: string;
+          return_date: string;
+          gap_days: number;
+          protocol: "slip" | "drift";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          habit_id?: string | null;
+          track_type: "engine" | "break" | "build";
+          track_name: string;
+          fall_date: string;
+          return_date: string;
+          gap_days: number;
+          protocol: "slip" | "drift";
+        };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      weekly_reviews: {
+        Row: {
+          id: string;
+          user_id: string;
+          week_ending: string;
+          engine_response: string | null;
+          quality_added: string | null;
+          coaching_notes: string | null;
+          self_rated_consistency: number | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          week_ending: string;
+          engine_response?: string | null;
+          quality_added?: string | null;
+          coaching_notes?: string | null;
+          self_rated_consistency?: number | null;
+        };
+        Update: {
+          engine_response?: string | null;
+          quality_added?: string | null;
+          coaching_notes?: string | null;
+          self_rated_consistency?: number | null;
+        };
+        Relationships: [];
+      };
+      weekly_review_habits: {
+        Row: {
+          id: string;
+          review_id: string;
+          habit_id: string;
+          what_done: string | null;
+          what_got_in_way: string | null;
+          adjustment: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          review_id: string;
+          habit_id: string;
+          what_done?: string | null;
+          what_got_in_way?: string | null;
+          adjustment?: string | null;
+        };
+        Update: {
+          what_done?: string | null;
+          what_got_in_way?: string | null;
+          adjustment?: string | null;
+        };
+        Relationships: [];
+      };
+      distress_tolerance_log: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: "sit" | "urge_surf";
+          started_at: string;
+          duration_seconds: number;
+          body_location: string | null;
+          survived_it_note: string | null;
+          completed: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          type: "sit" | "urge_surf";
+          started_at?: string;
+          duration_seconds: number;
+          body_location?: string | null;
+          survived_it_note?: string | null;
+          completed?: boolean;
+        };
+        Update: {
+          duration_seconds?: number;
+          body_location?: string | null;
+          survived_it_note?: string | null;
+          completed?: boolean;
+        };
+        Relationships: [];
+      };
+      slip_drift_log: {
+        Row: {
+          id: string;
+          user_id: string;
+          habit_id: string | null;
+          track_type: "engine" | "break" | "build";
+          type: "slip" | "drift";
+          triggered_at: string;
+          cause_category:
+            | "distress_tolerance"
+            | "logistics"
+            | "emotional_load"
+            | null;
+          job_id: string | null;
+          emotional_state_before: string | null;
+          all_or_nothing_stage: string | null;
+          protocol_completed: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          habit_id?: string | null;
+          track_type: "engine" | "break" | "build";
+          type: "slip" | "drift";
+          triggered_at?: string;
+          cause_category?:
+            | "distress_tolerance"
+            | "logistics"
+            | "emotional_load"
+            | null;
+          job_id?: string | null;
+          emotional_state_before?: string | null;
+          all_or_nothing_stage?: string | null;
+          protocol_completed?: boolean;
+        };
+        Update: {
+          cause_category?:
+            | "distress_tolerance"
+            | "logistics"
+            | "emotional_load"
+            | null;
+          job_id?: string | null;
+          emotional_state_before?: string | null;
+          all_or_nothing_stage?: string | null;
+          protocol_completed?: boolean;
         };
         Relationships: [];
       };
@@ -242,12 +401,23 @@ export type BreakObservationEmotion =
   Database["public"]["Tables"]["break_observation_emotions"]["Row"];
 export type BuildObservation =
   Database["public"]["Tables"]["build_observations"]["Row"];
+export type StandingUpEntry =
+  Database["public"]["Tables"]["standing_up_log"]["Row"];
+export type WeeklyReview =
+  Database["public"]["Tables"]["weekly_reviews"]["Row"];
+export type WeeklyReviewHabit =
+  Database["public"]["Tables"]["weekly_review_habits"]["Row"];
+export type DistressToleranceEntry =
+  Database["public"]["Tables"]["distress_tolerance_log"]["Row"];
+export type SlipDriftEntry =
+  Database["public"]["Tables"]["slip_drift_log"]["Row"];
 
 // App-level types
 export type HabitCategory = "break" | "build";
 export type HabitStatus = "active" | "scheduled" | "paused" | "deactivated";
-
-export type MarkType = "full" | "dot" | "half";
+export type MarkType = "full" | "dot" | "half" | "slip";
+export type TrackType = "engine" | "break" | "build";
+export type ProtocolType = "slip" | "drift";
 
 export interface HabitWithConfigs extends Habit {
   configs: HabitConfig[];
@@ -255,4 +425,8 @@ export interface HabitWithConfigs extends Habit {
 
 export interface BreakObservationWithEmotions extends BreakObservation {
   emotions: BreakObservationEmotion[];
+}
+
+export interface WeeklyReviewWithHabits extends WeeklyReview {
+  habit_reviews: WeeklyReviewHabit[];
 }
