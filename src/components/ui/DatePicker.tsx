@@ -106,18 +106,18 @@ export function DatePicker({ value, onSelect, onClose }: DatePickerProps) {
                 const isSelected = cell.date === value;
                 const isToday = cell.date === today;
 
-                let cellClass =
-                  "flex items-center justify-center h-9 rounded-xl font-sans text-[13px] border-none bg-transparent";
+                const base =
+                  "flex items-center justify-center h-9 rounded-xl font-sans text-[13px]";
 
-                if (isFuture) {
-                  cellClass += " opacity-30 cursor-default text-plum";
-                } else if (isSelected) {
-                  cellClass += " bg-amber text-canvas cursor-pointer";
-                } else if (isToday) {
-                  cellClass += " border border-amber text-amber cursor-pointer";
-                } else {
-                  cellClass += " text-plum cursor-pointer";
-                }
+                const stateClass = isFuture
+                  ? "bg-transparent border-none opacity-30 cursor-default text-plum"
+                  : isSelected
+                    ? "bg-amber border-none text-canvas cursor-pointer"
+                    : isToday
+                      ? "bg-transparent border border-amber text-amber cursor-pointer"
+                      : "bg-transparent border-none text-plum cursor-pointer";
+
+                const cellClass = `${base} ${stateClass}`;
 
                 return (
                   <button
