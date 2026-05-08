@@ -35,7 +35,7 @@
         "jsdom": "^29.0.2",
         "lint-staged": "^16.4.0",
         "prettier": "^3.8.3",
-        "supabase": "^2.93.0",
+        "supabase": "^2.95.7",
         "tailwindcss": "^4.2.3",
         "typescript": "~6.0.2",
         "typescript-eslint": "^8.58.2",
@@ -1234,7 +1234,7 @@
 
     "strip-json-comments": ["strip-json-comments@3.1.1", "", {}, "sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig=="],
 
-    "supabase": ["supabase@2.93.0", "", { "dependencies": { "bin-links": "^6.0.0", "https-proxy-agent": "^9.0.0", "node-fetch": "^3.3.2", "tar": "7.5.13" }, "bin": { "supabase": "bin/supabase" } }, "sha512-2R4nRuOfcSzwjnIGLbGPrsqLnDIUDzg8ozM3xWkwToMkEu0pKfZbhFJz8AaUpKgBnbs4RgQkbcxPA+IESJFypw=="],
+    "supabase": ["supabase@2.95.7", "", { "dependencies": { "bin-links": "^6.0.0", "https-proxy-agent": "^9.0.0", "node-fetch": "^3.3.2", "tar": "7.5.13" }, "bin": { "supabase": "bin/supabase" } }, "sha512-apjcZZYN70ID4LxlAHstiPoKzI3inZfCkUlF8MroCUTY2Myrl1FOR+kGPF9q/Q1ViBUHVBFHimnLd5W/+4QYHg=="],
 
     "supports-color": ["supports-color@7.2.0", "", { "dependencies": { "has-flag": "^4.0.0" } }, "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw=="],
 

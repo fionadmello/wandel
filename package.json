@@ -53,7 +53,7 @@
     "jsdom": "^29.0.2",
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.3",
-    "supabase": "^2.93.0",
+    "supabase": "^2.95.7",
     "tailwindcss": "^4.2.3",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
