@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Chip } from "@/components/ui/Chip";
@@ -35,6 +35,7 @@ function getSubTypes(configs: HabitConfig[]): string[] {
 interface MarkFormProps {
   configs: HabitConfig[];
   subType: string | null;
+  existingId: string | null;
   existingMark: MarkType | null;
   existingNote: string;
   habitId: string;
@@ -47,6 +48,7 @@ interface MarkFormProps {
 function MarkForm({
   configs,
   subType,
+  existingId,
   existingMark,
   existingNote,
   habitId,
@@ -60,10 +62,20 @@ function MarkForm({
   );
   const [note, setNote] = useState(existingNote);
   const [submitted, setSubmitted] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const { mutate: upsert, isPending } = useUpsertBuildObservation(userId);
 
   const anchor = getConfigValue(configs, "anchor", subType);
   const logDate = date ?? format(new Date(), "yyyy-MM-dd");
+
+  useEffect(() => {
+    if (!confirming) return;
+    const timer = setTimeout(() => {
+      setConfirming(false);
+      onLogged?.();
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [confirming, onLogged]);
 
   const handleLog = () => {
     setSubmitted(true);
@@ -72,16 +84,25 @@ function MarkForm({
     const markDef = MARKS.find((m) => m.type === selectedMark)!;
     upsert(
       {
+        id: existingId ?? undefined,
         habit_id: habitId,
         date: logDate,
-        sub_type: subType ?? undefined,
+        sub_type: subType ?? null,
         mark_type: selectedMark,
         mark_label: markDef.label,
         note: note.trim() || undefined,
       },
-      { onSuccess: onLogged },
+      { onSuccess: () => setConfirming(true) },
     );
   };
+
+  if (confirming) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <p className="font-serif italic text-[28px] text-plum">Logged.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -214,6 +235,7 @@ export function BuildLogForm({
             key={selectedSubType}
             configs={safeConfigs}
             subType={selectedSubType}
+            existingId={findObs(selectedSubType)?.id ?? null}
             existingMark={findObs(selectedSubType)?.mark_type ?? null}
             existingNote={findObs(selectedSubType)?.note ?? ""}
             habitId={habitId}
@@ -233,6 +255,7 @@ export function BuildLogForm({
     <MarkForm
       configs={safeConfigs}
       subType={null}
+      existingId={existing?.id ?? null}
       existingMark={existing?.mark_type ?? null}
       existingNote={existing?.note ?? ""}
       habitId={habitId}

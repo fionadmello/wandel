@@ -55,26 +55,43 @@ export function useUpsertBuildObservation(userId: string) {
 
   return useMutation({
     mutationFn: async (payload: {
+      id?: string;
       habit_id: string;
       date: string;
-      sub_type?: string;
+      sub_type?: string | null;
       mark_type: MarkType;
       mark_label: string;
       note?: string;
     }) => {
+      const { id, ...fields } = payload;
+
+      if (id) {
+        const { data, error } = await supabase
+          .from("build_observations")
+          .update({
+            mark_type: fields.mark_type,
+            mark_label: fields.mark_label,
+            note: fields.note ?? null,
+          })
+          .eq("id", id)
+          .select()
+          .single();
+        if (error) throw error;
+        return data as BuildObservation;
+      }
+
       const { data, error } = await supabase
         .from("build_observations")
-        .upsert(
-          { user_id: userId, ...payload },
-          { onConflict: "habit_id,date" },
-        )
+        .insert({ user_id: userId, ...fields })
         .select()
         .single();
-
       if (error) throw error;
       return data as BuildObservation;
     },
     onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["build_observations_day", userId, data.habit_id, data.date],
+      });
       queryClient.invalidateQueries({
         queryKey: ["build_observation", userId, data.habit_id, data.date],
       });
