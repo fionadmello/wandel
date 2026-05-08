@@ -1,0 +1,85 @@
+import { format, subDays } from "date-fns";
+
+import type { Habit } from "@/types/database";
+import type { PendingProtocol } from "@/types/protocols";
+
+function countConsecutiveMisses(
+  habitId: string,
+  obsByDate: Map<string, Set<string>>,
+  today: string,
+): number {
+  let count = 0;
+  for (let i = 1; i <= 10; i++) {
+    const date = format(subDays(new Date(today), i), "yyyy-MM-dd");
+    if (obsByDate.get(date)?.has(habitId)) break;
+    count++;
+  }
+  return count;
+}
+
+export function detectHabitDrift(
+  activeHabits: Habit[],
+  breakObsByDate: Map<string, Set<string>>,
+  buildObsByDate: Map<string, Set<string>>,
+  today: string,
+): PendingProtocol | null {
+  const drifting: Array<{ habit: Habit; missedDays: number }> = [];
+
+  for (const habit of activeHabits) {
+    if (habit.status !== "active") continue;
+    const obsByDate =
+      habit.category === "break" ? breakObsByDate : buildObsByDate;
+    const missed = countConsecutiveMisses(habit.id, obsByDate, today);
+    if (missed >= 2) drifting.push({ habit, missedDays: missed });
+  }
+
+  if (drifting.length === 0) return null;
+
+  drifting.sort((a, b) => b.missedDays - a.missedDays);
+  const { habit, missedDays } = drifting[0];
+
+  return {
+    id: "habit_drift",
+    habitId: habit.id,
+    trackType: habit.category,
+    trackName: habit.name,
+    driftDays: missedDays,
+    currentStep: 0,
+  };
+}
+
+export function detectEngineDrift(
+  engineMarkDates: Set<string>,
+  today: string,
+): PendingProtocol | null {
+  let missed = 0;
+  for (let i = 1; i <= 10; i++) {
+    const date = format(subDays(new Date(today), i), "yyyy-MM-dd");
+    if (engineMarkDates.has(date)) break;
+    missed++;
+  }
+
+  if (missed >= 7) {
+    return {
+      id: "engine_drift",
+      habitId: null,
+      trackType: "engine",
+      trackName: "Mirror practice",
+      driftDays: missed,
+      currentStep: 0,
+    };
+  }
+
+  if (missed >= 3) {
+    return {
+      id: "engine_slip",
+      habitId: null,
+      trackType: "engine",
+      trackName: "Mirror practice",
+      driftDays: missed,
+      currentStep: 0,
+    };
+  }
+
+  return null;
+}
