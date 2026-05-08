@@ -12,6 +12,7 @@ export interface Database {
           reminder_index: number;
           reminder_last_rotated: string | null;
           setup_complete: boolean;
+          last_protocol_check: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -27,6 +28,7 @@ export interface Database {
           reminder_index?: number;
           reminder_last_rotated?: string | null;
           setup_complete?: boolean;
+          last_protocol_check?: string | null;
         };
         Relationships: [];
       };
