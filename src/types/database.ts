@@ -222,6 +222,36 @@ export interface Database {
         };
         Relationships: [];
       };
+      pending_protocols: {
+        Row: {
+          user_id: string;
+          protocol_id: "engine_slip" | "engine_drift" | "habit_drift";
+          habit_id: string | null;
+          track_type: "engine" | "break" | "build";
+          track_name: string;
+          drift_days: number | null;
+          current_step: number;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          protocol_id: "engine_slip" | "engine_drift" | "habit_drift";
+          habit_id?: string | null;
+          track_type: "engine" | "break" | "build";
+          track_name: string;
+          drift_days?: number | null;
+          current_step?: number;
+        };
+        Update: {
+          protocol_id?: "engine_slip" | "engine_drift" | "habit_drift";
+          habit_id?: string | null;
+          track_type?: "engine" | "break" | "build";
+          track_name?: string;
+          drift_days?: number | null;
+          current_step?: number;
+        };
+        Relationships: [];
+      };
       standing_up_log: {
         Row: {
           id: string;
@@ -401,6 +431,8 @@ export type BreakObservationEmotion =
   Database["public"]["Tables"]["break_observation_emotions"]["Row"];
 export type BuildObservation =
   Database["public"]["Tables"]["build_observations"]["Row"];
+export type PendingProtocolRow =
+  Database["public"]["Tables"]["pending_protocols"]["Row"];
 export type StandingUpEntry =
   Database["public"]["Tables"]["standing_up_log"]["Row"];
 export type WeeklyReview =
