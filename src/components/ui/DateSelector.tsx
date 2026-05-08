@@ -33,10 +33,7 @@ export function DateSelector({ value, onChange }: DateSelectorProps) {
       {isOpen && (
         <DatePicker
           value={value}
-          onSelect={(date) => {
-            onChange(date);
-            setIsOpen(false);
-          }}
+          onSelect={onChange}
           onClose={() => setIsOpen(false)}
         />
       )}

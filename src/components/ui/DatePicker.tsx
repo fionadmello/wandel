@@ -124,10 +124,7 @@ export function DatePicker({ value, onSelect, onClose }: DatePickerProps) {
                     key={cell.date}
                     type="button"
                     onClick={() => {
-                      if (!isFuture) {
-                        onSelect(cell.date);
-                        onClose();
-                      }
+                      if (!isFuture) onSelect(cell.date);
                     }}
                     className={cellClass}
                   >
