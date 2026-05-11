@@ -6,7 +6,6 @@ interface DayCellProps {
   hasMirror: boolean;
   breakCount: number;
   buildCount: number;
-  slipCount: number;
   isFuture: boolean;
   onTap: () => void;
 }
@@ -17,12 +16,10 @@ export function DayCell({
   hasMirror,
   breakCount,
   buildCount,
-  slipCount,
   isFuture,
   onTap,
 }: DayCellProps) {
-  const hasData =
-    hasMirror || breakCount > 0 || buildCount > 0 || slipCount > 0;
+  const hasData = hasMirror || breakCount > 0 || buildCount > 0;
   const today = format(new Date(), "yyyy-MM-dd");
   const isActualToday = date === today;
 
@@ -50,9 +47,6 @@ export function DayCell({
         ))}
         {Array.from({ length: buildCount }).map((_, i) => (
           <span key={i} className="w-[5px] h-[5px] rounded-full bg-amber" />
-        ))}
-        {Array.from({ length: slipCount }).map((_, i) => (
-          <span key={i} className="w-[5px] h-[5px] rounded-full bg-slip" />
         ))}
       </div>
     </button>

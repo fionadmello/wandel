@@ -78,6 +78,7 @@ function HistoryContent({ userId }: HistoryContentProps) {
         year={year}
         month={month}
         engineMarks={engineMarks}
+        breakHabits={breakHabits}
         breakObs={breakObs}
         buildObs={buildObs}
         onDayTap={setSelectedDate}
@@ -95,10 +96,6 @@ function HistoryContent({ userId }: HistoryContentProps) {
         <div className="flex items-center gap-1.5">
           <span className="w-[5px] h-[5px] rounded-full bg-amber" />
           <span className="font-sans text-[10px] text-muted">Build</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-[5px] h-[5px] rounded-full bg-slip" />
-          <span className="font-sans text-[10px] text-muted">Slip</span>
         </div>
       </div>
 

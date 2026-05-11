@@ -183,14 +183,11 @@ export function DaySheet({
                       {obs.map((o) => (
                         <div
                           key={o.id}
-                          className={`bg-card rounded-2xl px-4 py-3 flex flex-col gap-1 ${o.mark_type === "slip" ? "border-l-2 border-slip" : ""}`}
+                          className="bg-card rounded-2xl px-4 py-3 flex flex-col gap-1"
                         >
-                          <p
-                            className={`font-sans text-[13px] font-medium ${o.mark_type === "slip" ? "text-slip" : "text-plum"}`}
-                          >
-                            {o.mark_type === "slip"
-                              ? "Slip"
-                              : `${o.sub_type ? `${o.sub_type} · ` : ""}${o.mark_label}`}
+                          <p className="font-sans text-[13px] font-medium text-plum">
+                            {o.sub_type ? `${o.sub_type} · ` : ""}
+                            {o.mark_label}
                           </p>
                           {o.note && (
                             <p className="font-sans text-[12px] text-muted">

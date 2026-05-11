@@ -200,7 +200,7 @@ export interface Database {
           user_id: string;
           date: string;
           sub_type: string | null;
-          mark_type: "full" | "dot" | "half" | "slip";
+          mark_type: "full" | "dot" | "half";
           mark_label: string;
           note: string | null;
           logged_at: string;
@@ -211,14 +211,14 @@ export interface Database {
           user_id: string;
           date: string;
           sub_type?: string | null;
-          mark_type: "full" | "dot" | "half" | "slip";
+          mark_type: "full" | "dot" | "half";
           mark_label: string;
           note?: string | null;
           logged_at?: string;
         };
         Update: {
           sub_type?: string | null;
-          mark_type?: "full" | "dot" | "half" | "slip";
+          mark_type?: "full" | "dot" | "half";
           mark_label?: string;
           note?: string | null;
         };
@@ -449,7 +449,7 @@ export type SlipDriftEntry =
 // App-level types
 export type HabitCategory = "break" | "build";
 export type HabitStatus = "active" | "scheduled" | "paused" | "deactivated";
-export type MarkType = "full" | "dot" | "half" | "slip";
+export type MarkType = "full" | "dot" | "half";
 export type TrackType = "engine" | "break" | "build";
 export type ProtocolType = "slip" | "drift";
 
