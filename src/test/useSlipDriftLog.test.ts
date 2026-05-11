@@ -3,16 +3,29 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useLogSlipDrift } from "@/hooks/useSlipDriftLog";
+import {
+  useLogSlipDrift,
+  useRecentEngineDriftCount,
+} from "@/hooks/useSlipDriftLog";
 
-const { mockSingle } = vi.hoisted(() => ({
+const { mockSingle, mockGte } = vi.hoisted(() => ({
   mockSingle: vi.fn(),
+  mockGte: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase", () => ({
   supabase: {
     from: () => ({
       insert: () => ({ select: () => ({ single: mockSingle }) }),
+      select: () => ({
+        eq: () => ({
+          eq: () => ({
+            eq: () => ({
+              gte: mockGte,
+            }),
+          }),
+        }),
+      }),
     }),
   },
 }));
@@ -72,5 +85,47 @@ describe("useLogSlipDrift", () => {
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+});
+
+describe("useRecentEngineDriftCount", () => {
+  it("returns the count of recent engine drift entries", async () => {
+    mockGte.mockResolvedValue({ count: 3, error: null });
+
+    const { result } = renderHook(() => useRecentEngineDriftCount("user-1"), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toBe(3);
+  });
+
+  it("returns 0 when count is null", async () => {
+    mockGte.mockResolvedValue({ count: null, error: null });
+
+    const { result } = renderHook(() => useRecentEngineDriftCount("user-1"), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toBe(0);
+  });
+
+  it("throws when query errors", async () => {
+    mockGte.mockResolvedValue({ count: null, error: { message: "DB error" } });
+
+    const { result } = renderHook(() => useRecentEngineDriftCount("user-1"), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+
+  it("does not run when userId is empty", () => {
+    const { result } = renderHook(() => useRecentEngineDriftCount(""), {
+      wrapper,
+    });
+    expect(result.current.fetchStatus).toBe("idle");
+    expect(mockGte).not.toHaveBeenCalled();
   });
 });
