@@ -7,6 +7,7 @@ import { useState } from "react";
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { Button } from "@/components/ui/Button";
 import { DateSelector } from "@/components/ui/DateSelector";
+import { HabitSlipModal } from "@/features/protocols/HabitSlipModal";
 import { useBreakHabit } from "@/hooks/useBreakHabits";
 import {
   useResetBreakHabit,
@@ -35,6 +36,7 @@ function HabitContent({
   );
   const [showJobConfig, setShowJobConfig] = useState(false);
   const [confirmingReset, setConfirmingReset] = useState(false);
+  const [showSlipModal, setShowSlipModal] = useState(false);
   const navigate = useNavigate();
 
   const { mutate: updateStatus, isPending: isUpdatingStatus } =
@@ -91,7 +93,26 @@ function HabitContent({
               jobConfigs={habit.configs}
               date={logDate}
             />
+            <button
+              type="button"
+              onClick={() => setShowSlipModal(true)}
+              className="font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer pb-2"
+            >
+              I slipped
+            </button>
           </>
+        )}
+
+        {showSlipModal && (
+          <HabitSlipModal
+            habit={{
+              habitId: habit.id,
+              trackType: "break",
+              trackName: habit.name,
+            }}
+            userId={userId}
+            onComplete={() => setShowSlipModal(false)}
+          />
         )}
 
         {habit.status === "paused" && habit.paused_at && (

@@ -9,23 +9,29 @@ import { useBreakHabit } from "@/hooks/useBreakHabits";
 import { useLogBreakObservation } from "@/hooks/useBreakObservations";
 import { useLogSlipDrift } from "@/hooks/useSlipDriftLog";
 import { useLogStandingUp } from "@/hooks/useStandingUpLog";
-import type { PendingProtocol } from "@/types/protocols";
+import type { TrackType } from "@/types/database";
 
 type Phase = 1 | 2 | 3 | 4;
 type CauseCategory = "distress_tolerance" | "logistics" | "emotional_load";
 
+export interface HabitSlipContext {
+  habitId: string;
+  trackType: TrackType;
+  trackName: string;
+}
+
 interface HabitSlipModalProps {
-  protocol: PendingProtocol;
+  habit: HabitSlipContext;
   userId: string;
   onComplete: () => void;
 }
 
 export function HabitSlipModal({
-  protocol,
+  habit,
   userId,
   onComplete,
 }: HabitSlipModalProps) {
-  const isBreak = protocol.trackType === "break";
+  const isBreak = habit.trackType === "break";
 
   const [phase, setPhase] = useState<Phase>(1);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
@@ -40,7 +46,7 @@ export function HabitSlipModal({
 
   const { data: breakHabit } = useBreakHabit(
     userId,
-    isBreak ? (protocol.habitId ?? "") : "",
+    isBreak ? habit.habitId : "",
   );
   const jobConfigs = (breakHabit?.configs ?? []).filter((c) => c.key === "job");
 
@@ -87,14 +93,14 @@ export function HabitSlipModal({
       if (isBreak) {
         await Promise.all([
           logBreakObservation({
-            habit_id: protocol.habitId!,
+            habit_id: habit.habitId,
             job: selectedJobValue ?? undefined,
             emotions: [],
           }),
           logSlipDrift({
             track_type: "break",
             type: "slip",
-            habit_id: protocol.habitId,
+            habit_id: habit.habitId,
             job_id: selectedJobId,
             cause_category: selectedCause,
             emotional_state_before: emotionText,
@@ -103,9 +109,9 @@ export function HabitSlipModal({
           }),
           logStandingUp({
             track_type: "break",
-            track_name: protocol.trackName,
+            track_name: habit.trackName,
             protocol: "slip",
-            habit_id: protocol.habitId,
+            habit_id: habit.habitId,
             gap_days: 0,
             fall_date: today,
             return_date: today,
@@ -115,7 +121,7 @@ export function HabitSlipModal({
         await logSlipDrift({
           track_type: "build",
           type: "slip",
-          habit_id: protocol.habitId,
+          habit_id: habit.habitId,
           job_id: null,
           cause_category: selectedCause,
           emotional_state_before: emotionText,

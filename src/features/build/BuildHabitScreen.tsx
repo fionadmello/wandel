@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { DateSelector } from "@/components/ui/DateSelector";
 import { PausedBanner } from "@/features/break/PausedBanner";
+import { HabitSlipModal } from "@/features/protocols/HabitSlipModal";
 import { useBuildHabit } from "@/hooks/useBuildHabits";
 import {
   useResetBuildHabit,
@@ -34,6 +35,7 @@ function BuildHabitContent({
     initialLogDate ?? format(new Date(), "yyyy-MM-dd"),
   );
   const [showConfig, setShowConfig] = useState(false);
+  const [showSlipModal, setShowSlipModal] = useState(false);
   const navigate = useNavigate();
 
   const { mutate: updateStatus, isPending: isUpdatingStatus } =
@@ -91,7 +93,26 @@ function BuildHabitContent({
               configs={habit.configs ?? []}
               date={logDate}
             />
+            <button
+              type="button"
+              onClick={() => setShowSlipModal(true)}
+              className="font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer pb-2"
+            >
+              I slipped
+            </button>
           </>
+        )}
+
+        {showSlipModal && (
+          <HabitSlipModal
+            habit={{
+              habitId: habit.id,
+              trackType: "build",
+              trackName: habit.name,
+            }}
+            userId={userId}
+            onComplete={() => setShowSlipModal(false)}
+          />
         )}
 
         {habit.status === "scheduled" && (

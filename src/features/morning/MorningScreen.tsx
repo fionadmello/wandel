@@ -5,7 +5,11 @@ import { useState } from "react";
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
 import { DateSelector } from "@/components/ui/DateSelector";
 import { ReminderCard } from "@/components/ui/ReminderCard";
+import type { HabitSlipContext } from "@/features/protocols/HabitSlipModal";
+import { HabitSlipModal } from "@/features/protocols/HabitSlipModal";
+import { useBreakHabits } from "@/hooks/useBreakHabits";
 import { useBreakObservations } from "@/hooks/useBreakObservations";
+import { useBuildHabits } from "@/hooks/useBuildHabits";
 import { useEngineMark } from "@/hooks/useEngineMark";
 import { useProfile, useProfileQualities } from "@/hooks/useProfile";
 import { useReminderRotation } from "@/hooks/useReminderRotation";
@@ -24,6 +28,9 @@ interface MorningContentProps {
 
 function MorningContent({ userId, initialLogDate }: MorningContentProps) {
   const [logDate, setLogDate] = useState(initialLogDate);
+  const [slippingHabit, setSlippingHabit] = useState<HabitSlipContext | null>(
+    null,
+  );
   const isToday = logDate === format(new Date(), "yyyy-MM-dd");
 
   const profileQuery = useProfile(userId);
@@ -31,6 +38,8 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
   const engineMarkQuery = useEngineMark(userId, logDate);
   const breakObsQuery = useBreakObservations(userId, logDate);
   const buildObsQuery = useTodayBuildObservations(userId);
+  const breakHabitsQuery = useBreakHabits(userId);
+  const buildHabitsQuery = useBuildHabits(userId);
 
   const reminder = useReminderRotation(userId);
   const marked = !!engineMarkQuery.data;
@@ -38,6 +47,13 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
   const qualities = qualitiesQuery.data ?? [];
   const breakObsCount = breakObsQuery.data?.length ?? 0;
   const hasBuildObs = (buildObsQuery.data?.length ?? 0) > 0;
+
+  const activeBreakHabits = (breakHabitsQuery.data ?? [])
+    .filter((h) => h.status === "active")
+    .map((h) => ({ id: h.id, name: h.name, category: "break" as const }));
+  const activeBuildHabits = (buildHabitsQuery.data ?? [])
+    .filter((h) => h.status === "active")
+    .map((h) => ({ id: h.id, name: h.name, category: "build" as const }));
 
   return (
     <ScreenWrap>
@@ -57,8 +73,25 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
 
         <EngineSection userId={userId} marked={marked} date={logDate} />
 
-        {isToday && (breakObsCount > 0 || hasBuildObs) && (
-          <AtAGlance breakObsCount={breakObsCount} hasBuildObs={hasBuildObs} />
+        {isToday &&
+          (activeBreakHabits.length > 0 || activeBuildHabits.length > 0) && (
+            <AtAGlance
+              activeBreakHabits={activeBreakHabits}
+              activeBuildHabits={activeBuildHabits}
+              breakObsCount={breakObsCount}
+              hasBuildObs={hasBuildObs}
+              onSlip={(habitId, trackType, trackName) =>
+                setSlippingHabit({ habitId, trackType, trackName })
+              }
+            />
+          )}
+
+        {slippingHabit && (
+          <HabitSlipModal
+            habit={slippingHabit}
+            userId={userId}
+            onComplete={() => setSlippingHabit(null)}
+          />
         )}
       </div>
     </ScreenWrap>
