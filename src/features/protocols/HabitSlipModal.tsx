@@ -1,0 +1,293 @@
+import { format } from "date-fns";
+import { useState } from "react";
+
+import { Button } from "@/components/ui/Button";
+import { Chip } from "@/components/ui/Chip";
+import { EMOTIONS } from "@/constants/emotions";
+import { ProtocolModal } from "@/features/protocols/ProtocolModal";
+import { useBreakHabit } from "@/hooks/useBreakHabits";
+import { useLogBreakObservation } from "@/hooks/useBreakObservations";
+import { useLogSlipDrift } from "@/hooks/useSlipDriftLog";
+import { useLogStandingUp } from "@/hooks/useStandingUpLog";
+import type { PendingProtocol } from "@/types/protocols";
+
+type Phase = 1 | 2 | 3 | 4;
+type CauseCategory = "distress_tolerance" | "logistics" | "emotional_load";
+
+interface HabitSlipModalProps {
+  protocol: PendingProtocol;
+  userId: string;
+  onComplete: () => void;
+}
+
+export function HabitSlipModal({
+  protocol,
+  userId,
+  onComplete,
+}: HabitSlipModalProps) {
+  const isBreak = protocol.trackType === "break";
+
+  const [phase, setPhase] = useState<Phase>(1);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [selectedJobValue, setSelectedJobValue] = useState<string | null>(null);
+  const [selectedCause, setSelectedCause] = useState<CauseCategory | null>(
+    null,
+  );
+  const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
+  const [selectedStage, setSelectedStage] = useState<string | null>(null);
+  const [proudThing, setProudThing] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const { data: breakHabit } = useBreakHabit(
+    userId,
+    isBreak ? (protocol.habitId ?? "") : "",
+  );
+  const jobConfigs = (breakHabit?.configs ?? []).filter((c) => c.key === "job");
+
+  const { mutateAsync: logBreakObservation } = useLogBreakObservation(userId);
+  const { mutateAsync: logSlipDrift } = useLogSlipDrift(userId);
+  const { mutateAsync: logStandingUp } = useLogStandingUp(userId);
+
+  const toggleEmotion = (e: string) =>
+    setSelectedEmotions((prev) =>
+      prev.includes(e) ? prev.filter((x) => x !== e) : [...prev, e],
+    );
+
+  const selectJob = (id: string, value: string) => {
+    if (selectedJobId === id) {
+      setSelectedJobId(null);
+      setSelectedJobValue(null);
+    } else {
+      setSelectedJobId(id);
+      setSelectedJobValue(value);
+    }
+  };
+
+  const selectCause = (cause: CauseCategory) => {
+    setSelectedCause((prev) => (prev === cause ? null : cause));
+  };
+
+  const stageResponse =
+    selectedStage === "at_the_slip"
+      ? "One slip. The chain is not broken — it has a dot today."
+      : selectedStage === "what_is_the_point"
+        ? "Is this an accurate reading or a feeling moving fast?"
+        : selectedStage === "might_as_well"
+          ? "Never-miss-twice rule applied directly."
+          : selectedStage === "will_fail_again"
+            ? "Shame is not data. The record is data."
+            : null;
+
+  const handleComplete = async () => {
+    setIsSaving(true);
+    const today = format(new Date(), "yyyy-MM-dd");
+    const emotionText = selectedEmotions.join(", ") || null;
+
+    try {
+      if (isBreak) {
+        await Promise.all([
+          logBreakObservation({
+            habit_id: protocol.habitId!,
+            job: selectedJobValue ?? undefined,
+            emotions: [],
+          }),
+          logSlipDrift({
+            track_type: "break",
+            type: "slip",
+            habit_id: protocol.habitId,
+            job_id: selectedJobId,
+            cause_category: selectedCause,
+            emotional_state_before: emotionText,
+            all_or_nothing_stage: selectedStage,
+            protocol_completed: true,
+          }),
+          logStandingUp({
+            track_type: "break",
+            track_name: protocol.trackName,
+            protocol: "slip",
+            habit_id: protocol.habitId,
+            gap_days: 0,
+            fall_date: today,
+            return_date: today,
+          }),
+        ]);
+      } else {
+        await logSlipDrift({
+          track_type: "build",
+          type: "slip",
+          habit_id: protocol.habitId,
+          job_id: null,
+          cause_category: selectedCause,
+          emotional_state_before: emotionText,
+          all_or_nothing_stage: selectedStage,
+          protocol_completed: true,
+        });
+      }
+      onComplete();
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <ProtocolModal>
+      {phase === 1 && (
+        <div className="flex flex-col gap-8 px-6 pt-6 pb-12">
+          <p className="font-serif text-[22px] leading-snug text-plum">
+            {isBreak
+              ? "Finish it fully and consciously. No mid-instance punishment."
+              : "Today is behind you. Tomorrow counts."}
+          </p>
+          <Button variant="primary" onClick={() => setPhase(2)}>
+            Continue
+          </Button>
+        </div>
+      )}
+
+      {phase === 2 && (
+        <div className="flex flex-col gap-6 px-6 pt-6 pb-12">
+          {isBreak && jobConfigs.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <p className="font-sans text-[12px] text-muted">
+                What job was it doing?
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {jobConfigs.map((job) => (
+                  <Chip
+                    key={job.id}
+                    label={job.value}
+                    selected={selectedJobId === job.id}
+                    onToggle={() => selectJob(job.id, job.value)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-2">
+            <p className="font-sans text-[12px] text-muted">
+              What was unavailable?
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Chip
+                label="Distress tolerance"
+                selected={selectedCause === "distress_tolerance"}
+                onToggle={() => selectCause("distress_tolerance")}
+              />
+              <Chip
+                label="Logistics"
+                selected={selectedCause === "logistics"}
+                onToggle={() => selectCause("logistics")}
+              />
+              <Chip
+                label="Emotional load"
+                selected={selectedCause === "emotional_load"}
+                onToggle={() => selectCause("emotional_load")}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <p className="font-sans text-[12px] text-muted">
+              Emotional state before?
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {EMOTIONS.map((e) => (
+                <Chip
+                  key={e}
+                  label={e}
+                  selected={selectedEmotions.includes(e)}
+                  onToggle={() => toggleEmotion(e)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <Button variant="primary" onClick={() => setPhase(3)}>
+            Continue
+          </Button>
+        </div>
+      )}
+
+      {phase === 3 && (
+        <div className="flex flex-col gap-6 px-6 pt-6 pb-12">
+          <p className="font-sans text-[12px] text-muted">
+            Where are you right now?
+          </p>
+
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => setSelectedStage("at_the_slip")}
+              className={`text-left w-full px-4 py-3 rounded-2xl font-sans text-[13px] cursor-pointer transition-colors duration-100 ${selectedStage === "at_the_slip" ? "bg-transparent border border-plum text-plum font-medium" : "bg-transparent border border-border text-muted font-normal"}`}
+            >
+              Just this slip
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedStage("what_is_the_point")}
+              className={`text-left w-full px-4 py-3 rounded-2xl font-sans text-[13px] cursor-pointer transition-colors duration-100 ${selectedStage === "what_is_the_point" ? "bg-transparent border border-plum text-plum font-medium" : "bg-transparent border border-border text-muted font-normal"}`}
+            >
+              What is the point?
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedStage("might_as_well")}
+              className={`text-left w-full px-4 py-3 rounded-2xl font-sans text-[13px] cursor-pointer transition-colors duration-100 ${selectedStage === "might_as_well" ? "bg-transparent border border-plum text-plum font-medium" : "bg-transparent border border-border text-muted font-normal"}`}
+            >
+              Might as well go all the way
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedStage("will_fail_again")}
+              className={`text-left w-full px-4 py-3 rounded-2xl font-sans text-[13px] cursor-pointer transition-colors duration-100 ${selectedStage === "will_fail_again" ? "bg-transparent border border-plum text-plum font-medium" : "bg-transparent border border-border text-muted font-normal"}`}
+            >
+              I will fail again
+            </button>
+          </div>
+
+          {stageResponse && (
+            <p className="font-serif italic text-[18px] text-plum leading-snug">
+              {stageResponse}
+            </p>
+          )}
+
+          <Button
+            variant="primary"
+            onClick={() => setPhase(4)}
+            disabled={!selectedStage}
+          >
+            Continue
+          </Button>
+        </div>
+      )}
+
+      {phase === 4 && (
+        <div className="flex flex-col gap-6 px-6 pt-6 pb-12">
+          <p className="font-serif text-[20px] leading-snug text-plum">
+            What is one small thing I can do today that I will genuinely feel
+            proud of?
+          </p>
+
+          <textarea
+            value={proudThing}
+            onChange={(e) => setProudThing(e.target.value)}
+            rows={3}
+            placeholder="Optional."
+            className="w-full bg-card border border-[0.5px] border-border rounded-2xl px-4 py-3 font-sans text-[13px] text-plum outline-none resize-none placeholder:text-muted"
+          />
+
+          <Button
+            variant="accent"
+            onClick={() => {
+              void handleComplete();
+            }}
+            disabled={isSaving}
+          >
+            {isSaving ? "Saving…" : "One slip is weather."}
+          </Button>
+        </div>
+      )}
+    </ProtocolModal>
+  );
+}
