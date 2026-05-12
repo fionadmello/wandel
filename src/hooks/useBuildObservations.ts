@@ -1,8 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { differenceInDays, format } from "date-fns";
 
 import { supabase } from "@/lib/supabase";
-import type { BuildObservation, MarkType } from "@/types/database";
+import type {
+  BuildObservation,
+  MarkType,
+  ProtocolType,
+  TrackType,
+} from "@/types/database";
 
 export function useBuildObservation(
   userId: string,
@@ -88,13 +93,67 @@ export function useUpsertBuildObservation(userId: string) {
       if (error) throw error;
       return data as BuildObservation;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({
         queryKey: ["build_observations_day", userId, data.habit_id, data.date],
       });
       queryClient.invalidateQueries({
         queryKey: ["build_observation", userId, data.habit_id, data.date],
       });
+
+      try {
+        // Write deferred standing_up_log for build habit slips/drifts
+        const { data: recentSlip } = await supabase
+          .from("slip_drift_log")
+          .select("triggered_at, track_type, type")
+          .eq("user_id", userId)
+          .eq("habit_id", data.habit_id)
+          .in("type", ["slip", "drift"])
+          .order("triggered_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (!recentSlip) return;
+
+        const fallDate = recentSlip.triggered_at.slice(0, 10);
+        if (fallDate >= data.date) return;
+
+        const { data: existing } = await supabase
+          .from("standing_up_log")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("habit_id", data.habit_id)
+          .gte("return_date", fallDate)
+          .limit(1)
+          .maybeSingle();
+
+        if (existing) return;
+
+        const { data: habit } = await supabase
+          .from("habits")
+          .select("name")
+          .eq("id", data.habit_id)
+          .single();
+
+        if (!habit) return;
+
+        await supabase.from("standing_up_log").insert({
+          user_id: userId,
+          habit_id: data.habit_id,
+          track_type: recentSlip.track_type as TrackType,
+          track_name: habit.name,
+          protocol: recentSlip.type as ProtocolType,
+          fall_date: fallDate,
+          return_date: data.date,
+          gap_days: differenceInDays(new Date(data.date), new Date(fallDate)),
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ["standing_up_log", userId],
+        });
+      } catch {
+        // Standing up write is best-effort; don't fail the mutation
+      }
     },
   });
 }

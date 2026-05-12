@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { supabase } from "@/lib/supabase";
 import type {
@@ -15,6 +15,31 @@ interface StandingUpPayload {
   gap_days: number;
   fall_date: string;
   return_date: string;
+}
+
+export function useStandingUpEntries(
+  userId: string,
+  trackType: TrackType,
+  habitId?: string | null,
+) {
+  return useQuery({
+    queryKey: ["standing_up_log", userId, trackType, habitId ?? null],
+    queryFn: async () => {
+      const base = supabase
+        .from("standing_up_log")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("track_type", trackType);
+
+      const { data, error } = await (
+        habitId ? base.eq("habit_id", habitId) : base
+      ).order("return_date", { ascending: false });
+
+      if (error) throw error;
+      return data as StandingUpEntry[];
+    },
+    enabled: !!userId,
+  });
 }
 
 export function useLogStandingUp(userId: string) {

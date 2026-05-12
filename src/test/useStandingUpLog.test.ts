@@ -1,78 +1,110 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useLogStandingUp } from "@/hooks/useStandingUpLog";
+import { useStandingUpEntries } from "@/hooks/useStandingUpLog";
+import type { StandingUpEntry } from "@/types/database";
 
-const { mockSingle } = vi.hoisted(() => ({
-  mockSingle: vi.fn(),
-}));
+const { mockOrder } = vi.hoisted(() => ({ mockOrder: vi.fn() }));
 
-vi.mock("@/lib/supabase", () => ({
-  supabase: {
-    from: () => ({
-      insert: () => ({ select: () => ({ single: mockSingle }) }),
-    }),
-  },
-}));
+vi.mock("@/lib/supabase", () => {
+  const builder: Record<string, unknown> = {};
+  builder.select = () => builder;
+  builder.eq = () => builder;
+  builder.order = mockOrder;
+  return { supabase: { from: () => builder } };
+});
 
-const PAYLOAD = {
-  track_type: "engine" as const,
-  track_name: "Mirror",
-  protocol: "slip" as const,
-  habit_id: null,
-  gap_days: 4,
-  fall_date: "2026-05-07",
-  return_date: "2026-05-11",
-};
-
-const ENTRY = {
+const ENGINE_ENTRY: StandingUpEntry = {
   id: "entry-1",
   user_id: "user-1",
-  ...PAYLOAD,
+  habit_id: null,
+  track_type: "engine",
+  track_name: "Mirror",
+  fall_date: "2026-05-08",
+  return_date: "2026-05-11",
+  gap_days: 3,
+  protocol: "slip",
+  created_at: "2026-05-11T00:00:00Z",
+};
+
+const HABIT_ENTRY: StandingUpEntry = {
+  id: "entry-2",
+  user_id: "user-1",
+  habit_id: "habit-1",
+  track_type: "break",
+  track_name: "Smoking",
+  fall_date: "2026-05-10",
+  return_date: "2026-05-11",
+  gap_days: 1,
+  protocol: "drift",
   created_at: "2026-05-11T00:00:00Z",
 };
 
 function wrapper({ children }: { children: React.ReactNode }) {
   const client = new QueryClient({
-    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+    defaultOptions: { queries: { retry: false } },
   });
   return React.createElement(QueryClientProvider, { client }, children);
 }
 
 beforeEach(() => vi.clearAllMocks());
 
-describe("useLogStandingUp", () => {
-  it("inserts with correct payload including user_id", async () => {
-    mockSingle.mockResolvedValue({ data: ENTRY, error: null });
+describe("useStandingUpEntries", () => {
+  it("returns empty array when no entries exist", async () => {
+    mockOrder.mockResolvedValue({ data: [], error: null });
 
-    const { result } = renderHook(() => useLogStandingUp("user-1"), {
-      wrapper,
-    });
-
-    await act(async () => {
-      result.current.mutate(PAYLOAD);
-    });
+    const { result } = renderHook(
+      () => useStandingUpEntries("user-1", "engine"),
+      { wrapper },
+    );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toEqual(ENTRY);
+    expect(result.current.data).toEqual([]);
   });
 
-  it("throws when insert errors", async () => {
-    mockSingle.mockResolvedValue({
-      data: null,
-      error: { message: "DB error" },
-    });
+  it("returns entries for engine track without habitId filter", async () => {
+    mockOrder.mockResolvedValue({ data: [ENGINE_ENTRY], error: null });
 
-    const { result } = renderHook(() => useLogStandingUp("user-1"), {
+    const { result } = renderHook(
+      () => useStandingUpEntries("user-1", "engine"),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual([ENGINE_ENTRY]);
+  });
+
+  it("returns entries filtered by habitId for break track", async () => {
+    mockOrder.mockResolvedValue({ data: [HABIT_ENTRY], error: null });
+
+    const { result } = renderHook(
+      () => useStandingUpEntries("user-1", "break", "habit-1"),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual([HABIT_ENTRY]);
+  });
+
+  it("throws when query errors", async () => {
+    mockOrder.mockResolvedValue({ data: null, error: { message: "DB error" } });
+
+    const { result } = renderHook(
+      () => useStandingUpEntries("user-1", "engine"),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+
+  it("does not run when userId is empty", () => {
+    const { result } = renderHook(() => useStandingUpEntries("", "engine"), {
       wrapper,
     });
 
-    await act(async () => {
-      result.current.mutate(PAYLOAD);
-    });
-
-    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(result.current.fetchStatus).toBe("idle");
+    expect(mockOrder).not.toHaveBeenCalled();
   });
 });
