@@ -82,7 +82,8 @@ describe("detectHabitDrift", () => {
       category: "build",
       name: "Running",
     });
-    // break habit has recent observations (no drift), build habit has none
+    // break habit: 2 consecutive slip observations = 2 drift days
+    // build habit: no observations = 10 drift days — wins as most drifted
     const breakObs = obsByDate([
       ["2026-05-07", ["break-1"]],
       ["2026-05-06", ["break-1"]],
@@ -95,6 +96,41 @@ describe("detectHabitDrift", () => {
     );
     expect(result?.habitId).toBe("build-1");
     expect(result?.trackType).toBe("build");
+  });
+
+  it("returns drift for break habit with 2+ consecutive slip observations", () => {
+    const habit = makeHabit({
+      id: "break-1",
+      category: "break",
+      name: "Smoking",
+    });
+    const breakObs = obsByDate([
+      ["2026-05-07", ["break-1"]],
+      ["2026-05-06", ["break-1"]],
+    ]);
+    const result = detectHabitDrift([habit], breakObs, EMPTY, TODAY);
+    expect(result?.id).toBe("habit_drift");
+    expect(result?.habitId).toBe("break-1");
+    expect(result?.driftDays).toBe(2);
+  });
+
+  it("returns null for break habit with no observations — clean days are not drift", () => {
+    const habit = makeHabit({
+      id: "break-1",
+      category: "break",
+      name: "Smoking",
+    });
+    expect(detectHabitDrift([habit], EMPTY, EMPTY, TODAY)).toBeNull();
+  });
+
+  it("returns null for break habit with only one slip day", () => {
+    const habit = makeHabit({
+      id: "break-1",
+      category: "break",
+      name: "Smoking",
+    });
+    const breakObs = obsByDate([["2026-05-07", ["break-1"]]]);
+    expect(detectHabitDrift([habit], breakObs, EMPTY, TODAY)).toBeNull();
   });
 
   it("returns null when there are no active habits", () => {

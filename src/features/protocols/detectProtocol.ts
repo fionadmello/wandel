@@ -5,13 +5,17 @@ import type { PendingProtocol } from "@/types/protocols";
 
 function countConsecutiveMisses(
   habitId: string,
+  category: "break" | "build",
   obsByDate: Map<string, Set<string>>,
   today: string,
 ): number {
   let count = 0;
   for (let i = 1; i <= 10; i++) {
     const date = format(subDays(new Date(today), i), "yyyy-MM-dd");
-    if (obsByDate.get(date)?.has(habitId)) break;
+    const hasObs = !!obsByDate.get(date)?.has(habitId);
+    // break habit: a slip (observation exists) is a miss; build habit: no observation is a miss
+    const isMiss = category === "break" ? hasObs : !hasObs;
+    if (!isMiss) break;
     count++;
   }
   return count;
@@ -29,7 +33,12 @@ export function detectHabitDrift(
     if (habit.status !== "active") continue;
     const obsByDate =
       habit.category === "break" ? breakObsByDate : buildObsByDate;
-    const missed = countConsecutiveMisses(habit.id, obsByDate, today);
+    const missed = countConsecutiveMisses(
+      habit.id,
+      habit.category,
+      obsByDate,
+      today,
+    );
     if (missed >= 2) drifting.push({ habit, missedDays: missed });
   }
 
