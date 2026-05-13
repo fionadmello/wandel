@@ -1,4 +1,3 @@
-import { format, subDays } from "date-fns";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
@@ -6,7 +5,6 @@ import { Chip } from "@/components/ui/Chip";
 import { ProtocolModal } from "@/features/protocols/ProtocolModal";
 import { useProfileQualities } from "@/hooks/useProfile";
 import { useLogSlipDrift } from "@/hooks/useSlipDriftLog";
-import { useLogStandingUp } from "@/hooks/useStandingUpLog";
 import type { PendingProtocol } from "@/types/protocols";
 
 type Phase = 1 | 2 | 3;
@@ -33,7 +31,6 @@ export function EngineSlipModal({
   const { data: qualities = [] } = useProfileQualities(userId);
   const quality = qualities[0]?.value ?? "You";
 
-  const { mutateAsync: logStandingUp } = useLogStandingUp(userId);
   const { mutateAsync: logSlipDrift } = useLogSlipDrift(userId);
 
   useEffect(() => {
@@ -50,32 +47,19 @@ export function EngineSlipModal({
 
   const handleComplete = async () => {
     setIsSaving(true);
-    const today = format(new Date(), "yyyy-MM-dd");
-    const gapDays = protocol.driftDays ?? 0;
     const parts = [...selectedChips, freetext.trim()].filter(Boolean);
     const emotionText = parts.length > 0 ? parts.join("\n") : null;
 
     try {
-      await Promise.all([
-        logStandingUp({
-          track_type: "engine",
-          track_name: protocol.trackName,
-          protocol: "slip",
-          habit_id: null,
-          gap_days: gapDays,
-          fall_date: format(subDays(new Date(), gapDays), "yyyy-MM-dd"),
-          return_date: today,
-        }),
-        logSlipDrift({
-          track_type: "engine",
-          type: "slip",
-          job_id: null,
-          habit_id: null,
-          cause_category: null,
-          emotional_state_before: emotionText,
-          protocol_completed: true,
-        }),
-      ]);
+      await logSlipDrift({
+        track_type: "engine",
+        type: "slip",
+        job_id: null,
+        habit_id: null,
+        cause_category: null,
+        emotional_state_before: emotionText,
+        protocol_completed: true,
+      });
       onComplete();
     } finally {
       setIsSaving(false);

@@ -20,8 +20,10 @@ export function useProtocolDetection(
   const alreadyChecked = profile?.last_protocol_check === today;
   const shouldDetect = !!userId && !alreadyChecked;
 
-  const { data: breakHabits = [] } = useBreakHabits(userId);
-  const { data: buildHabits = [] } = useBuildHabits(userId);
+  const { data: breakHabits = [], isLoading: breakHabitsLoading } =
+    useBreakHabits(userId);
+  const { data: buildHabits = [], isLoading: buildHabitsLoading } =
+    useBuildHabits(userId);
 
   const since = format(subDays(new Date(), 10), "yyyy-MM-dd");
 
@@ -71,10 +73,22 @@ export function useProtocolDetection(
   });
 
   const isChecking =
-    shouldDetect && (engineLoading || breakObsLoading || buildObsLoading);
+    shouldDetect &&
+    (breakHabitsLoading ||
+      buildHabitsLoading ||
+      engineLoading ||
+      breakObsLoading ||
+      buildObsLoading);
 
   const detected = useMemo(() => {
-    if (!shouldDetect || engineLoading || breakObsLoading || buildObsLoading) {
+    if (
+      !shouldDetect ||
+      breakHabitsLoading ||
+      buildHabitsLoading ||
+      engineLoading ||
+      breakObsLoading ||
+      buildObsLoading
+    ) {
       return [];
     }
 
@@ -110,6 +124,8 @@ export function useProtocolDetection(
     return engineProtocol ? [...habitDrifts, engineProtocol] : habitDrifts;
   }, [
     shouldDetect,
+    breakHabitsLoading,
+    buildHabitsLoading,
     engineLoading,
     breakObsLoading,
     buildObsLoading,

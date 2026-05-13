@@ -1,4 +1,3 @@
-import { format, subDays } from "date-fns";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/Button";
@@ -8,7 +7,6 @@ import {
   useLogSlipDrift,
   useRecentEngineDriftCount,
 } from "@/hooks/useSlipDriftLog";
-import { useLogStandingUp } from "@/hooks/useStandingUpLog";
 import type { PendingProtocol } from "@/types/protocols";
 
 type Phase = 1 | 2 | 3 | 4 | 5;
@@ -37,7 +35,6 @@ export function EngineDriftModal({
   const { data: profile } = useProfile(userId);
   const { data: recentDriftCount = 0 } = useRecentEngineDriftCount(userId);
 
-  const { mutateAsync: logStandingUp } = useLogStandingUp(userId);
   const { mutateAsync: logSlipDrift } = useLogSlipDrift(userId);
 
   const currentQuality = qualities[qualityIndex];
@@ -67,28 +64,15 @@ export function EngineDriftModal({
 
   const handleReturn = async () => {
     setIsSaving(true);
-    const today = format(new Date(), "yyyy-MM-dd");
-    const gapDays = protocol.driftDays ?? 0;
     try {
-      await Promise.all([
-        logStandingUp({
-          track_type: "engine",
-          track_name: protocol.trackName,
-          protocol: "drift",
-          habit_id: null,
-          gap_days: gapDays,
-          fall_date: format(subDays(new Date(), gapDays), "yyyy-MM-dd"),
-          return_date: today,
-        }),
-        logSlipDrift({
-          track_type: "engine",
-          type: "drift",
-          job_id: null,
-          habit_id: null,
-          emotional_state_before: freetext.trim() || null,
-          protocol_completed: true,
-        }),
-      ]);
+      await logSlipDrift({
+        track_type: "engine",
+        type: "drift",
+        job_id: null,
+        habit_id: null,
+        emotional_state_before: freetext.trim() || null,
+        protocol_completed: true,
+      });
       setPhase(5);
     } finally {
       setIsSaving(false);
