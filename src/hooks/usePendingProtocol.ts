@@ -15,45 +15,46 @@ function fromRow(row: PendingProtocolRow): PendingProtocol {
   };
 }
 
-export function usePendingProtocol(userId: string) {
+export function usePendingProtocols(userId: string) {
   return useQuery({
-    queryKey: ["pending_protocol", userId],
+    queryKey: ["pending_protocols", userId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pending_protocols")
         .select("*")
         .eq("user_id", userId)
-        .maybeSingle();
-
+        .order("created_at");
       if (error) throw error;
-      return data ? fromRow(data as PendingProtocolRow) : null;
+      return (data as PendingProtocolRow[]).map(fromRow);
     },
     enabled: !!userId,
   });
 }
 
-export function useSetPendingProtocol(userId: string) {
+export function useSetPendingProtocols(userId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (protocol: PendingProtocol) => {
+    mutationFn: async (protocols: PendingProtocol[]) => {
+      if (protocols.length === 0) return;
       const { error } = await supabase.from("pending_protocols").upsert(
-        {
+        protocols.map((p) => ({
           user_id: userId,
-          protocol_id: protocol.id,
-          habit_id: protocol.habitId,
-          track_type: protocol.trackType,
-          track_name: protocol.trackName,
-          drift_days: protocol.driftDays,
-          current_step: protocol.currentStep,
-        },
-        { onConflict: "user_id" },
+          protocol_id: p.id,
+          habit_id: p.habitId,
+          track_type: p.trackType,
+          track_name: p.trackName,
+          drift_days: p.driftDays,
+          current_step: p.currentStep,
+        })),
+        { onConflict: "user_id,track_key" },
       );
-
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["pending_protocol", userId] });
+      queryClient.invalidateQueries({
+        queryKey: ["pending_protocols", userId],
+      });
     },
   });
 }
@@ -62,16 +63,19 @@ export function useClearPendingProtocol(userId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (protocol: PendingProtocol) => {
+      const trackKey = protocol.habitId ?? protocol.id;
       const { error } = await supabase
         .from("pending_protocols")
         .delete()
-        .eq("user_id", userId);
-
+        .eq("user_id", userId)
+        .eq("track_key", trackKey);
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["pending_protocol", userId] });
+      queryClient.invalidateQueries({
+        queryKey: ["pending_protocols", userId],
+      });
     },
   });
 }

@@ -97,8 +97,14 @@ export function EngineDriftModal({
 
   return (
     <ProtocolModal>
+      <div className="px-6 pt-5 pb-1">
+        <p className="font-sans text-[11px] text-muted uppercase tracking-wider">
+          {protocol.trackName}
+        </p>
+      </div>
+
       {phase === 1 && (
-        <div className="flex flex-col gap-6 px-6 pt-6 pb-12">
+        <div className="flex flex-col gap-6 px-6 pt-3 pb-12">
           <p className="font-serif text-[22px] leading-snug text-plum">
             You have been away for a while. The engine has been quiet. That is
             okay. It is time to come back.
@@ -127,7 +133,7 @@ export function EngineDriftModal({
       )}
 
       {phase === 2 && (
-        <div className="flex flex-col gap-8 px-6 pt-6 pb-12 min-h-[52dvh]">
+        <div className="flex flex-col gap-8 px-6 pt-3 pb-12 min-h-[52dvh]">
           <p className="font-sans text-[12px] text-muted leading-relaxed">
             These are not your words yet. They are borrowed truth. Someone who
             knows you wrote them. They are still true even when you have been
@@ -149,7 +155,7 @@ export function EngineDriftModal({
       )}
 
       {phase === 3 && (
-        <div className="flex flex-col justify-between gap-8 px-6 pt-6 pb-12 min-h-[44dvh]">
+        <div className="flex flex-col justify-between gap-8 px-6 pt-3 pb-12 min-h-[44dvh]">
           <p className="font-sans text-[12px] text-muted leading-relaxed">
             Read this out loud if you can. Even quietly. Even if it feels like a
             lie.
@@ -166,7 +172,7 @@ export function EngineDriftModal({
       )}
 
       {phase === 4 && (
-        <div className="flex flex-col gap-8 px-6 pt-6 pb-12">
+        <div className="flex flex-col gap-8 px-6 pt-3 pb-12">
           <p className="font-serif text-[20px] leading-snug text-plum">
             Stand in front of the mirror today. You do not have to say anything.
             Just look for a few seconds. That counts.
@@ -185,7 +191,7 @@ export function EngineDriftModal({
       )}
 
       {phase === 5 && (
-        <div className="flex flex-col gap-6 px-6 pt-6 pb-12">
+        <div className="flex flex-col gap-6 px-6 pt-3 pb-12">
           <p className="font-serif text-[20px] leading-snug text-plum">
             Is there one small thing you can do for yourself today, outside of
             the mirror?

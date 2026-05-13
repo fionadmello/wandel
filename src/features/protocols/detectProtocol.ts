@@ -26,7 +26,7 @@ export function detectHabitDrift(
   breakObsByDate: Map<string, Set<string>>,
   buildObsByDate: Map<string, Set<string>>,
   today: string,
-): PendingProtocol | null {
+): PendingProtocol[] {
   const drifting: Array<{ habit: Habit; missedDays: number }> = [];
 
   for (const habit of activeHabits) {
@@ -42,19 +42,16 @@ export function detectHabitDrift(
     if (missed >= 2) drifting.push({ habit, missedDays: missed });
   }
 
-  if (drifting.length === 0) return null;
-
   drifting.sort((a, b) => b.missedDays - a.missedDays);
-  const { habit, missedDays } = drifting[0];
 
-  return {
-    id: "habit_drift",
+  return drifting.map(({ habit, missedDays }) => ({
+    id: "habit_drift" as const,
     habitId: habit.id,
     trackType: habit.category,
     trackName: habit.name,
     driftDays: missedDays,
     currentStep: 0,
-  };
+  }));
 }
 
 export function detectEngineDrift(

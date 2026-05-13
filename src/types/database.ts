@@ -233,6 +233,7 @@ export interface Database {
           track_name: string;
           drift_days: number | null;
           current_step: number;
+          track_key: string;
           created_at: string;
         };
         Insert: {

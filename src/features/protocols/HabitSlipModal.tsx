@@ -137,8 +137,14 @@ export function HabitSlipModal({
 
   return (
     <ProtocolModal>
+      <div className="px-6 pt-5 pb-1">
+        <p className="font-sans text-[11px] text-muted uppercase tracking-wider">
+          {habit.trackName}
+        </p>
+      </div>
+
       {phase === 1 && (
-        <div className="flex flex-col gap-8 px-6 pt-6 pb-12">
+        <div className="flex flex-col gap-8 px-6 pt-3 pb-12">
           <p className="font-serif text-[22px] leading-snug text-plum">
             {isBreak
               ? "Finish it fully and consciously. No mid-instance punishment."
@@ -151,7 +157,7 @@ export function HabitSlipModal({
       )}
 
       {phase === 2 && (
-        <div className="flex flex-col gap-6 px-6 pt-6 pb-12">
+        <div className="flex flex-col gap-6 px-6 pt-3 pb-12">
           {isBreak && jobConfigs.length > 0 && (
             <div className="flex flex-col gap-2">
               <p className="font-sans text-[12px] text-muted">
@@ -216,7 +222,7 @@ export function HabitSlipModal({
       )}
 
       {phase === 3 && (
-        <div className="flex flex-col gap-6 px-6 pt-6 pb-12">
+        <div className="flex flex-col gap-6 px-6 pt-3 pb-12">
           <p className="font-sans text-[12px] text-muted">
             Where are you right now?
           </p>
@@ -269,7 +275,7 @@ export function HabitSlipModal({
       )}
 
       {phase === 4 && (
-        <div className="flex flex-col gap-6 px-6 pt-6 pb-12">
+        <div className="flex flex-col gap-6 px-6 pt-3 pb-12">
           <p className="font-serif text-[20px] leading-snug text-plum">
             What is one small thing I can do today that I will genuinely feel
             proud of?

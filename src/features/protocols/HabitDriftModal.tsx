@@ -102,8 +102,14 @@ export function HabitDriftModal({
 
   return (
     <ProtocolModal>
+      <div className="px-6 pt-5 pb-1">
+        <p className="font-sans text-[11px] text-muted uppercase tracking-wider">
+          {protocol.trackName}
+        </p>
+      </div>
+
       {phase === 1 && (
-        <div className="flex flex-col gap-6 px-6 pt-6 pb-12">
+        <div className="flex flex-col gap-6 px-6 pt-3 pb-12">
           <p className="font-serif text-[22px] leading-snug text-plum">
             You drifted for {driftDays} {driftDays === 1 ? "day" : "days"}. That
             happened.
@@ -124,7 +130,7 @@ export function HabitDriftModal({
       )}
 
       {phase === 2 && (
-        <div className="flex flex-col gap-6 px-6 pt-6 pb-12">
+        <div className="flex flex-col gap-6 px-6 pt-3 pb-12">
           <p className="font-sans text-[12px] text-muted">What gave way?</p>
 
           <div className="flex flex-wrap gap-2">
@@ -154,11 +160,19 @@ export function HabitDriftModal({
           <Button variant="primary" onClick={() => setPhase(3)}>
             Continue
           </Button>
+
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer"
+          >
+            Skip for now
+          </button>
         </div>
       )}
 
       {phase === 3 && (
-        <div className="flex flex-col gap-6 px-6 pt-6 pb-12">
+        <div className="flex flex-col gap-6 px-6 pt-3 pb-12">
           {isBreak ? (
             <p className="font-serif text-[20px] leading-snug text-plum">
               Return to awareness. That is enough for today.
@@ -190,6 +204,14 @@ export function HabitDriftModal({
           >
             {isSaving ? "Saving…" : "I am returning."}
           </Button>
+
+          <button
+            type="button"
+            onClick={onDismiss}
+            className="font-sans text-[13px] text-muted text-center bg-transparent border-none cursor-pointer"
+          >
+            Skip for now
+          </button>
         </div>
       )}
     </ProtocolModal>

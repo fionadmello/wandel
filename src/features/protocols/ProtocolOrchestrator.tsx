@@ -6,8 +6,8 @@ import { EngineSlipModal } from "@/features/protocols/EngineSlipModal";
 import { HabitDriftModal } from "@/features/protocols/HabitDriftModal";
 import {
   useClearPendingProtocol,
-  usePendingProtocol,
-  useSetPendingProtocol,
+  usePendingProtocols,
+  useSetPendingProtocols,
 } from "@/hooks/usePendingProtocol";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 import { useProtocolDetection } from "@/hooks/useProtocolDetection";
@@ -21,42 +21,56 @@ interface InnerProps {
 }
 
 function OrchestratorInner({ userId, profile }: InnerProps) {
-  const { protocol, isChecking } = useProtocolDetection(userId, profile);
-  const { data: existingPending } = usePendingProtocol(userId);
+  const pendingQuery = usePendingProtocols(userId);
+  const existingPending = pendingQuery.data ?? [];
+  const isPendingLoaded = pendingQuery.isSuccess;
 
-  const [activeProtocol, setActiveProtocol] = useState<PendingProtocol | null>(
-    null,
-  );
-  const didAct = useRef(false);
+  const { detected, isChecking } = useProtocolDetection(userId, profile);
 
-  const { mutate: setPending } = useSetPendingProtocol(userId);
-  const { mutate: clearPending } = useClearPendingProtocol(userId);
+  const [queue, setQueue] = useState<PendingProtocol[]>([]);
+  const didSetup = useRef(false);
+
+  const { mutate: setProtocols } = useSetPendingProtocols(userId);
+  const { mutate: clearProtocol } = useClearPendingProtocol(userId);
   const { mutate: updateProfile } = useUpdateProfile(userId);
 
   const today = format(new Date(), "yyyy-MM-dd");
 
   useEffect(() => {
-    if (!protocol || isChecking || didAct.current) return;
-    didAct.current = true;
+    if (isChecking || !isPendingLoaded || didSetup.current) return;
+    didSetup.current = true;
 
-    setActiveProtocol(protocol);
+    const existingKeys = new Set(existingPending.map((p) => p.habitId ?? p.id));
+    const newOnes = detected.filter(
+      (p) => !existingKeys.has(p.habitId ?? p.id),
+    );
+    const fullQueue = [...existingPending, ...newOnes];
+
+    setQueue(fullQueue);
+
+    if (newOnes.length > 0) {
+      setProtocols(newOnes);
+    }
 
     if (profile.last_protocol_check !== today) {
       updateProfile({ last_protocol_check: today });
     }
-
-    if (!existingPending) {
-      setPending(protocol);
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [protocol, isChecking]);
+  }, [isChecking, isPendingLoaded]);
 
-  const handleDismiss = () => setActiveProtocol(null);
+  const handleDismiss = () => {
+    const current = queue[0];
+    if (current) clearProtocol(current);
+    setQueue((q) => q.slice(1));
+  };
 
   const handleComplete = () => {
-    setActiveProtocol(null);
-    clearPending();
+    const current = queue[0];
+    if (current) clearProtocol(current);
+    setQueue((q) => q.slice(1));
   };
+
+  const activeProtocol = queue[0] ?? null;
 
   if (!activeProtocol) return null;
 

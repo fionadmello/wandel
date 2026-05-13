@@ -13,9 +13,7 @@ import {
 
 import { useProtocolDetection } from "@/hooks/useProtocolDetection";
 import type { Profile } from "@/types/database";
-import type { PendingProtocol } from "@/types/protocols";
 
-vi.mock("@/hooks/usePendingProtocol");
 vi.mock("@/hooks/useBreakHabits");
 vi.mock("@/hooks/useBuildHabits");
 vi.mock("@/lib/supabase", () => ({
@@ -32,18 +30,8 @@ vi.mock("@/lib/supabase", () => ({
 
 import { useBreakHabits } from "@/hooks/useBreakHabits";
 import { useBuildHabits } from "@/hooks/useBuildHabits";
-import { usePendingProtocol } from "@/hooks/usePendingProtocol";
 
 const TODAY = "2026-05-08";
-
-const PENDING: PendingProtocol = {
-  id: "habit_drift",
-  habitId: "habit-1",
-  trackType: "build",
-  trackName: "Running",
-  driftDays: 3,
-  currentStep: 1,
-};
 
 function makeProfile(overrides: Partial<Profile> = {}): Profile {
   return {
@@ -86,51 +74,37 @@ beforeEach(() => {
 });
 
 describe("useProtocolDetection", () => {
-  it("returns null immediately when already checked today", () => {
+  it("returns empty detected array and not checking when already checked today", () => {
     const profile = makeProfile({ last_protocol_check: TODAY });
-    vi.mocked(usePendingProtocol).mockReturnValue({
-      data: null,
-      isSuccess: true,
-    } as unknown as ReturnType<typeof usePendingProtocol>);
 
     const { result } = renderHook(
       () => useProtocolDetection("user-1", profile),
       { wrapper },
     );
 
-    expect(result.current.protocol).toBeNull();
+    expect(result.current.detected).toEqual([]);
     expect(result.current.isChecking).toBe(false);
   });
 
-  it("returns the pending protocol when one exists in Supabase", () => {
+  it("returns isChecking true while detection queries are loading", () => {
     const profile = makeProfile({ last_protocol_check: null });
-    vi.mocked(usePendingProtocol).mockReturnValue({
-      data: PENDING,
-      isSuccess: true,
-    } as unknown as ReturnType<typeof usePendingProtocol>);
 
     const { result } = renderHook(
       () => useProtocolDetection("user-1", profile),
       { wrapper },
     );
 
-    expect(result.current.protocol).toEqual(PENDING);
-    expect(result.current.isChecking).toBe(false);
-  });
-
-  it("returns null and isChecking while pending protocol query is loading", () => {
-    const profile = makeProfile({ last_protocol_check: null });
-    vi.mocked(usePendingProtocol).mockReturnValue({
-      data: undefined,
-      isSuccess: false,
-    } as unknown as ReturnType<typeof usePendingProtocol>);
-
-    const { result } = renderHook(
-      () => useProtocolDetection("user-1", profile),
-      { wrapper },
-    );
-
-    expect(result.current.protocol).toBeNull();
     expect(result.current.isChecking).toBe(true);
+  });
+
+  it("does not check when userId is empty", () => {
+    const profile = makeProfile({ last_protocol_check: null });
+
+    const { result } = renderHook(() => useProtocolDetection("", profile), {
+      wrapper,
+    });
+
+    expect(result.current.detected).toEqual([]);
+    expect(result.current.isChecking).toBe(false);
   });
 });

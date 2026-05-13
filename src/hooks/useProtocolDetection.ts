@@ -8,7 +8,6 @@ import {
 } from "@/features/protocols/detectProtocol";
 import { useBreakHabits } from "@/hooks/useBreakHabits";
 import { useBuildHabits } from "@/hooks/useBuildHabits";
-import { usePendingProtocol } from "@/hooks/usePendingProtocol";
 import { supabase } from "@/lib/supabase";
 import type { Profile } from "@/types/database";
 import type { PendingProtocol } from "@/types/protocols";
@@ -16,15 +15,10 @@ import type { PendingProtocol } from "@/types/protocols";
 export function useProtocolDetection(
   userId: string,
   profile: Profile | undefined,
-): { protocol: PendingProtocol | null; isChecking: boolean } {
+): { detected: PendingProtocol[]; isChecking: boolean } {
   const today = format(new Date(), "yyyy-MM-dd");
   const alreadyChecked = profile?.last_protocol_check === today;
-
-  const { data: pending, isSuccess: pendingLoaded } =
-    usePendingProtocol(userId);
-
-  const shouldDetect =
-    !!userId && !alreadyChecked && pendingLoaded && pending === null;
+  const shouldDetect = !!userId && !alreadyChecked;
 
   const { data: breakHabits = [] } = useBreakHabits(userId);
   const { data: buildHabits = [] } = useBuildHabits(userId);
@@ -77,18 +71,12 @@ export function useProtocolDetection(
   });
 
   const isChecking =
-    !alreadyChecked &&
-    (!pendingLoaded ||
-      (shouldDetect && (engineLoading || breakObsLoading || buildObsLoading)));
+    shouldDetect && (engineLoading || breakObsLoading || buildObsLoading);
 
-  const protocol = useMemo(() => {
-    if (alreadyChecked || !pendingLoaded) return null;
-    if (pending !== null) return pending;
-    if (engineLoading || breakObsLoading || buildObsLoading) return null;
-
-    const allActive = [...breakHabits, ...buildHabits].filter(
-      (h) => h.status === "active",
-    );
+  const detected = useMemo(() => {
+    if (!shouldDetect || engineLoading || breakObsLoading || buildObsLoading) {
+      return [];
+    }
 
     const breakObsByDate = new Map<string, Set<string>>();
     breakObsRecent.forEach((o) => {
@@ -103,19 +91,25 @@ export function useProtocolDetection(
       buildObsByDate.get(o.date)!.add(o.habit_id);
     });
 
-    const habitDrift = detectHabitDrift(
+    const allActive = [...breakHabits, ...buildHabits].filter(
+      (h) => h.status === "active",
+    );
+
+    const habitDrifts = detectHabitDrift(
       allActive,
       breakObsByDate,
       buildObsByDate,
       today,
     );
-    if (habitDrift) return habitDrift;
 
-    return detectEngineDrift(new Set(engineMarks.map((m) => m.date)), today);
+    const engineProtocol = detectEngineDrift(
+      new Set(engineMarks.map((m) => m.date)),
+      today,
+    );
+
+    return engineProtocol ? [...habitDrifts, engineProtocol] : habitDrifts;
   }, [
-    alreadyChecked,
-    pendingLoaded,
-    pending,
+    shouldDetect,
     engineLoading,
     breakObsLoading,
     buildObsLoading,
@@ -127,5 +121,5 @@ export function useProtocolDetection(
     today,
   ]);
 
-  return { protocol, isChecking };
+  return { detected, isChecking };
 }

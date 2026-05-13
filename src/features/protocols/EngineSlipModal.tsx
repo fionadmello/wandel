@@ -84,8 +84,14 @@ export function EngineSlipModal({
 
   return (
     <ProtocolModal>
+      <div className="px-6 pt-5 pb-1">
+        <p className="font-sans text-[11px] text-muted uppercase tracking-wider">
+          {protocol.trackName}
+        </p>
+      </div>
+
       {phase === 1 && (
-        <div className="flex flex-col gap-6 px-6 pt-6 pb-12">
+        <div className="flex flex-col gap-6 px-6 pt-3 pb-12">
           <p className="font-serif text-[22px] leading-snug text-plum">
             Hey. You have not shown up for a few days.
           </p>
@@ -131,7 +137,7 @@ export function EngineSlipModal({
       )}
 
       {phase === 2 && (
-        <div className="flex flex-col items-center justify-center gap-10 px-6 pt-6 pb-12 min-h-[44dvh]">
+        <div className="flex flex-col items-center justify-center gap-10 px-6 pt-3 pb-12 min-h-[44dvh]">
           <p
             className={`font-serif font-semibold text-[44px] text-plum text-center leading-none transition-all duration-500 ease-out ${qualityVisible ? "scale-100 opacity-100" : "scale-90 opacity-0"}`}
           >

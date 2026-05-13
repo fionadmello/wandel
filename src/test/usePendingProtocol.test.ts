@@ -5,25 +5,24 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   useClearPendingProtocol,
-  usePendingProtocol,
-  useSetPendingProtocol,
+  usePendingProtocols,
+  useSetPendingProtocols,
 } from "@/hooks/usePendingProtocol";
 import type { PendingProtocolRow } from "@/types/database";
 import type { PendingProtocol } from "@/types/protocols";
 
-const { mockMaybeSingle, mockUpsert, mockDelete } = vi.hoisted(() => ({
-  mockMaybySingle: vi.fn(),
-  mockMaybeSingle: vi.fn(),
+const { mockSelect, mockUpsert, mockDeleteEq } = vi.hoisted(() => ({
+  mockSelect: vi.fn(),
   mockUpsert: vi.fn(),
-  mockDelete: vi.fn(),
+  mockDeleteEq: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase", () => ({
   supabase: {
     from: () => ({
-      select: () => ({ eq: () => ({ maybeSingle: mockMaybeSingle }) }),
+      select: mockSelect,
       upsert: mockUpsert,
-      delete: () => ({ eq: mockDelete }),
+      delete: () => ({ eq: () => ({ eq: mockDeleteEq }) }),
     }),
   },
 }));
@@ -36,6 +35,7 @@ const ROW: PendingProtocolRow = {
   track_name: "Running",
   drift_days: 3,
   current_step: 1,
+  track_key: "habit-1",
   created_at: "2026-05-08T00:00:00Z",
 };
 
@@ -57,36 +57,44 @@ function wrapper({ children }: { children: React.ReactNode }) {
 
 beforeEach(() => vi.clearAllMocks());
 
-describe("usePendingProtocol", () => {
-  it("returns null when no row exists", async () => {
-    mockMaybeSingle.mockResolvedValue({ data: null, error: null });
+describe("usePendingProtocols", () => {
+  it("returns empty array when no rows exist", async () => {
+    mockSelect.mockReturnValue({
+      eq: () => ({ order: () => Promise.resolve({ data: [], error: null }) }),
+    });
 
-    const { result } = renderHook(() => usePendingProtocol("user-1"), {
+    const { result } = renderHook(() => usePendingProtocols("user-1"), {
       wrapper,
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toBeNull();
+    expect(result.current.data).toEqual([]);
   });
 
-  it("maps the db row to PendingProtocol", async () => {
-    mockMaybeSingle.mockResolvedValue({ data: ROW, error: null });
+  it("maps db rows to PendingProtocol array", async () => {
+    mockSelect.mockReturnValue({
+      eq: () => ({
+        order: () => Promise.resolve({ data: [ROW], error: null }),
+      }),
+    });
 
-    const { result } = renderHook(() => usePendingProtocol("user-1"), {
+    const { result } = renderHook(() => usePendingProtocols("user-1"), {
       wrapper,
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toEqual(PROTOCOL);
+    expect(result.current.data).toEqual([PROTOCOL]);
   });
 
   it("throws when query errors", async () => {
-    mockMaybeSingle.mockResolvedValue({
-      data: null,
-      error: { message: "DB error" },
+    mockSelect.mockReturnValue({
+      eq: () => ({
+        order: () =>
+          Promise.resolve({ data: null, error: { message: "DB error" } }),
+      }),
     });
 
-    const { result } = renderHook(() => usePendingProtocol("user-1"), {
+    const { result } = renderHook(() => usePendingProtocols("user-1"), {
       wrapper,
     });
 
@@ -94,48 +102,63 @@ describe("usePendingProtocol", () => {
   });
 
   it("does not run when userId is empty", () => {
-    const { result } = renderHook(() => usePendingProtocol(""), { wrapper });
+    const { result } = renderHook(() => usePendingProtocols(""), { wrapper });
     expect(result.current.fetchStatus).toBe("idle");
-    expect(mockMaybeSingle).not.toHaveBeenCalled();
+    expect(mockSelect).not.toHaveBeenCalled();
   });
 });
 
-describe("useSetPendingProtocol", () => {
-  it("upserts the correct row shape", async () => {
+describe("useSetPendingProtocols", () => {
+  it("upserts all protocols with correct shape", async () => {
     mockUpsert.mockResolvedValue({ error: null });
 
-    const { result } = renderHook(() => useSetPendingProtocol("user-1"), {
+    const { result } = renderHook(() => useSetPendingProtocols("user-1"), {
       wrapper,
     });
 
     await act(async () => {
-      result.current.mutate(PROTOCOL);
+      result.current.mutate([PROTOCOL]);
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(mockUpsert).toHaveBeenCalledWith(
-      {
-        user_id: "user-1",
-        protocol_id: "habit_drift",
-        habit_id: "habit-1",
-        track_type: "build",
-        track_name: "Running",
-        drift_days: 3,
-        current_step: 1,
-      },
-      { onConflict: "user_id" },
+      [
+        {
+          user_id: "user-1",
+          protocol_id: "habit_drift",
+          habit_id: "habit-1",
+          track_type: "build",
+          track_name: "Running",
+          drift_days: 3,
+          current_step: 1,
+        },
+      ],
+      { onConflict: "user_id,track_key" },
     );
+  });
+
+  it("skips the upsert when given an empty array", async () => {
+    const { result } = renderHook(() => useSetPendingProtocols("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate([]);
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockUpsert).not.toHaveBeenCalled();
   });
 
   it("throws when upsert errors", async () => {
     mockUpsert.mockResolvedValue({ error: { message: "DB error" } });
 
-    const { result } = renderHook(() => useSetPendingProtocol("user-1"), {
+    const { result } = renderHook(() => useSetPendingProtocols("user-1"), {
       wrapper,
     });
 
     await act(async () => {
-      result.current.mutate(PROTOCOL);
+      result.current.mutate([PROTOCOL]);
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
@@ -143,30 +166,54 @@ describe("useSetPendingProtocol", () => {
 });
 
 describe("useClearPendingProtocol", () => {
-  it("deletes the row for the user", async () => {
-    mockDelete.mockResolvedValue({ error: null });
+  it("deletes by user_id and track_key (habitId for habits)", async () => {
+    mockDeleteEq.mockResolvedValue({ error: null });
 
     const { result } = renderHook(() => useClearPendingProtocol("user-1"), {
       wrapper,
     });
 
     await act(async () => {
-      result.current.mutate();
+      result.current.mutate(PROTOCOL);
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(mockDelete).toHaveBeenCalledWith("user_id", "user-1");
+    expect(mockDeleteEq).toHaveBeenCalledWith("track_key", "habit-1");
   });
 
-  it("throws when delete errors", async () => {
-    mockDelete.mockResolvedValue({ error: { message: "DB error" } });
+  it("uses protocol id as track_key for engine protocols", async () => {
+    mockDeleteEq.mockResolvedValue({ error: null });
+
+    const engineProtocol: PendingProtocol = {
+      id: "engine_slip",
+      habitId: null,
+      trackType: "engine",
+      trackName: "Mirror",
+      driftDays: 3,
+      currentStep: 0,
+    };
 
     const { result } = renderHook(() => useClearPendingProtocol("user-1"), {
       wrapper,
     });
 
     await act(async () => {
-      result.current.mutate();
+      result.current.mutate(engineProtocol);
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockDeleteEq).toHaveBeenCalledWith("track_key", "engine_slip");
+  });
+
+  it("throws when delete errors", async () => {
+    mockDeleteEq.mockResolvedValue({ error: { message: "DB error" } });
+
+    const { result } = renderHook(() => useClearPendingProtocol("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate(PROTOCOL);
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));

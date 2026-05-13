@@ -28,47 +28,49 @@ function obsByDate(entries: [string, string[]][]): Map<string, Set<string>> {
 }
 
 describe("detectHabitDrift", () => {
-  it("returns null when habit has observations on both of the last two days", () => {
+  it("returns empty array when habit has observations on both of the last two days", () => {
     const habits = [makeHabit()];
     const obs = obsByDate([
       ["2026-05-07", ["habit-1"]],
       ["2026-05-06", ["habit-1"]],
     ]);
-    expect(detectHabitDrift(habits, EMPTY, obs, TODAY)).toBeNull();
+    expect(detectHabitDrift(habits, EMPTY, obs, TODAY)).toEqual([]);
   });
 
-  it("returns null when only yesterday is missed (first miss is weather)", () => {
+  it("returns empty array when only yesterday is missed", () => {
     const habits = [makeHabit()];
-    // logged day before yesterday, missed yesterday
     const obs = obsByDate([["2026-05-06", ["habit-1"]]]);
-    expect(detectHabitDrift(habits, EMPTY, obs, TODAY)).toBeNull();
+    expect(detectHabitDrift(habits, EMPTY, obs, TODAY)).toEqual([]);
   });
 
-  it("returns drift when two consecutive days are missed", () => {
+  it("returns drift entry when two consecutive days are missed", () => {
     const habits = [makeHabit()];
     const result = detectHabitDrift(habits, EMPTY, EMPTY, TODAY);
-    expect(result).not.toBeNull();
-    expect(result?.id).toBe("habit_drift");
-    expect(result?.habitId).toBe("habit-1");
-    expect(result?.trackType).toBe("build");
-    expect(result?.trackName).toBe("Running");
-    expect(result?.currentStep).toBe(0);
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe("habit_drift");
+    expect(result[0].habitId).toBe("habit-1");
+    expect(result[0].trackType).toBe("build");
+    expect(result[0].trackName).toBe("Running");
+    expect(result[0].currentStep).toBe(0);
   });
 
   it("skips habits that are not active", () => {
     const habits = [makeHabit({ status: "paused" })];
-    expect(detectHabitDrift(habits, EMPTY, EMPTY, TODAY)).toBeNull();
+    expect(detectHabitDrift(habits, EMPTY, EMPTY, TODAY)).toEqual([]);
   });
 
-  it("returns the most drifted habit when multiple are drifting", () => {
+  it("returns all drifting habits sorted by most missed days first", () => {
     const habit1 = makeHabit({ id: "habit-1", name: "Running" });
     const habit2 = makeHabit({ id: "habit-2", name: "Meditation" });
     // habit1: logged on 2026-05-05 → 2 consecutive missed days
     // habit2: no observations → 10 consecutive missed days
     const obs = obsByDate([["2026-05-05", ["habit-1"]]]);
     const result = detectHabitDrift([habit1, habit2], EMPTY, obs, TODAY);
-    expect(result?.habitId).toBe("habit-2");
-    expect(result?.driftDays).toBe(10);
+    expect(result).toHaveLength(2);
+    expect(result[0].habitId).toBe("habit-2");
+    expect(result[0].driftDays).toBe(10);
+    expect(result[1].habitId).toBe("habit-1");
+    expect(result[1].driftDays).toBe(2);
   });
 
   it("checks break obs for break habits and build obs for build habits", () => {
@@ -83,7 +85,7 @@ describe("detectHabitDrift", () => {
       name: "Running",
     });
     // break habit: 2 consecutive slip observations = 2 drift days
-    // build habit: no observations = 10 drift days — wins as most drifted
+    // build habit: no observations = 10 drift days — first in sorted result
     const breakObs = obsByDate([
       ["2026-05-07", ["break-1"]],
       ["2026-05-06", ["break-1"]],
@@ -94,8 +96,9 @@ describe("detectHabitDrift", () => {
       EMPTY,
       TODAY,
     );
-    expect(result?.habitId).toBe("build-1");
-    expect(result?.trackType).toBe("build");
+    expect(result).toHaveLength(2);
+    expect(result[0].habitId).toBe("build-1");
+    expect(result[1].habitId).toBe("break-1");
   });
 
   it("returns drift for break habit with 2+ consecutive slip observations", () => {
@@ -109,32 +112,33 @@ describe("detectHabitDrift", () => {
       ["2026-05-06", ["break-1"]],
     ]);
     const result = detectHabitDrift([habit], breakObs, EMPTY, TODAY);
-    expect(result?.id).toBe("habit_drift");
-    expect(result?.habitId).toBe("break-1");
-    expect(result?.driftDays).toBe(2);
+    expect(result).toHaveLength(1);
+    expect(result[0].id).toBe("habit_drift");
+    expect(result[0].habitId).toBe("break-1");
+    expect(result[0].driftDays).toBe(2);
   });
 
-  it("returns null for break habit with no observations — clean days are not drift", () => {
+  it("returns empty array for break habit with no observations — clean days are not drift", () => {
     const habit = makeHabit({
       id: "break-1",
       category: "break",
       name: "Smoking",
     });
-    expect(detectHabitDrift([habit], EMPTY, EMPTY, TODAY)).toBeNull();
+    expect(detectHabitDrift([habit], EMPTY, EMPTY, TODAY)).toEqual([]);
   });
 
-  it("returns null for break habit with only one slip day", () => {
+  it("returns empty array for break habit with only one slip day", () => {
     const habit = makeHabit({
       id: "break-1",
       category: "break",
       name: "Smoking",
     });
     const breakObs = obsByDate([["2026-05-07", ["break-1"]]]);
-    expect(detectHabitDrift([habit], breakObs, EMPTY, TODAY)).toBeNull();
+    expect(detectHabitDrift([habit], breakObs, EMPTY, TODAY)).toEqual([]);
   });
 
-  it("returns null when there are no active habits", () => {
-    expect(detectHabitDrift([], EMPTY, EMPTY, TODAY)).toBeNull();
+  it("returns empty array when there are no active habits", () => {
+    expect(detectHabitDrift([], EMPTY, EMPTY, TODAY)).toEqual([]);
   });
 });
 
