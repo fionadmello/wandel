@@ -42,6 +42,22 @@ export function useStandingUpEntries(
   });
 }
 
+export function useAllStandingUpEntries(userId: string) {
+  return useQuery({
+    queryKey: ["standing_up_log", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("standing_up_log")
+        .select("*")
+        .eq("user_id", userId)
+        .order("return_date", { ascending: false });
+      if (error) throw error;
+      return data as StandingUpEntry[];
+    },
+    enabled: !!userId,
+  });
+}
+
 export function useLogStandingUp(userId: string) {
   const queryClient = useQueryClient();
 

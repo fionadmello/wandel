@@ -10,10 +10,13 @@ import {
   useMonthEngineMarks,
 } from "@/hooks/useMonthData";
 import { useSession } from "@/hooks/useSession";
+import { useAllStandingUpEntries } from "@/hooks/useStandingUpLog";
+import type { StandingUpEntry } from "@/types/database";
 
 import { CalendarGrid } from "./CalendarGrid";
 import { DaySheet } from "./DaySheet";
 import { MonthNav } from "./MonthNav";
+import { StandingUpSection } from "./StandingUpSection";
 
 interface HistoryContentProps {
   userId: string;
@@ -30,12 +33,46 @@ function HistoryContent({ userId }: HistoryContentProps) {
   const buildObsQuery = useMonthBuildObservations(userId, year, month);
   const breakHabitsQuery = useBreakHabits(userId);
   const buildHabitsQuery = useBuildHabits(userId);
+  const allStandingUpQuery = useAllStandingUpEntries(userId);
 
   const engineMarks = engineMarksQuery.data ?? [];
   const breakObs = breakObsQuery.data ?? [];
   const buildObs = buildObsQuery.data ?? [];
   const breakHabits = breakHabitsQuery.data ?? [];
   const buildHabits = buildHabitsQuery.data ?? [];
+  const allStandingUp = allStandingUpQuery.data ?? [];
+
+  const engineStandingUp = allStandingUp.filter(
+    (e) => e.track_type === "engine",
+  );
+
+  const activeHabitIds = new Set([
+    ...breakHabits.map((h) => h.id),
+    ...buildHabits.map((h) => h.id),
+  ]);
+
+  type HabitGroup = {
+    habitId: string;
+    trackName: string;
+    entries: StandingUpEntry[];
+  };
+  const habitGroupMap = new Map<string, HabitGroup>();
+  for (const entry of allStandingUp) {
+    if (!entry.habit_id) continue;
+    if (!habitGroupMap.has(entry.habit_id)) {
+      habitGroupMap.set(entry.habit_id, {
+        habitId: entry.habit_id,
+        trackName: entry.track_name,
+        entries: [],
+      });
+    }
+    habitGroupMap.get(entry.habit_id)!.entries.push(entry);
+  }
+  const habitGroups = [...habitGroupMap.values()].sort((a, b) => {
+    const aRank = activeHabitIds.has(a.habitId) ? 0 : 1;
+    const bRank = activeHabitIds.has(b.habitId) ? 0 : 1;
+    return aRank - bRank;
+  });
 
   const today = format(new Date(), "yyyy-MM-dd");
   const currentYear = now.getFullYear();
@@ -98,6 +135,19 @@ function HistoryContent({ userId }: HistoryContentProps) {
           <span className="font-sans text-[10px] text-muted">Build</span>
         </div>
       </div>
+
+      {(engineStandingUp.length > 0 || habitGroups.length > 0) && (
+        <div className="flex flex-col gap-1 px-2 pt-2 pb-1">
+          <StandingUpSection trackName="Mirror" entries={engineStandingUp} />
+          {habitGroups.map((group) => (
+            <StandingUpSection
+              key={group.habitId}
+              trackName={group.trackName}
+              entries={group.entries}
+            />
+          ))}
+        </div>
+      )}
 
       {selectedDate && (
         <DaySheet

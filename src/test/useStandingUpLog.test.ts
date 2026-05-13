@@ -3,7 +3,10 @@ import { renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { useStandingUpEntries } from "@/hooks/useStandingUpLog";
+import {
+  useAllStandingUpEntries,
+  useStandingUpEntries,
+} from "@/hooks/useStandingUpLog";
 import type { StandingUpEntry } from "@/types/database";
 
 const { mockOrder } = vi.hoisted(() => ({ mockOrder: vi.fn() }));
@@ -101,6 +104,52 @@ describe("useStandingUpEntries", () => {
 
   it("does not run when userId is empty", () => {
     const { result } = renderHook(() => useStandingUpEntries("", "engine"), {
+      wrapper,
+    });
+
+    expect(result.current.fetchStatus).toBe("idle");
+    expect(mockOrder).not.toHaveBeenCalled();
+  });
+});
+
+describe("useAllStandingUpEntries", () => {
+  it("returns all entries across tracks", async () => {
+    mockOrder.mockResolvedValue({
+      data: [ENGINE_ENTRY, HABIT_ENTRY],
+      error: null,
+    });
+
+    const { result } = renderHook(() => useAllStandingUpEntries("user-1"), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual([ENGINE_ENTRY, HABIT_ENTRY]);
+  });
+
+  it("returns empty array when no entries exist", async () => {
+    mockOrder.mockResolvedValue({ data: [], error: null });
+
+    const { result } = renderHook(() => useAllStandingUpEntries("user-1"), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual([]);
+  });
+
+  it("throws when query errors", async () => {
+    mockOrder.mockResolvedValue({ data: null, error: { message: "DB error" } });
+
+    const { result } = renderHook(() => useAllStandingUpEntries("user-1"), {
+      wrapper,
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+
+  it("does not run when userId is empty", () => {
+    const { result } = renderHook(() => useAllStandingUpEntries(""), {
       wrapper,
     });
 
