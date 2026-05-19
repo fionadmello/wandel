@@ -8,8 +8,8 @@ export function currentWeekEnding(today: Date = new Date()): string {
   return format(endOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
 }
 
-export function useWeeklyReview(userId: string) {
-  const weekEnding = currentWeekEnding();
+export function useWeeklyReview(userId: string, date?: Date) {
+  const weekEnding = currentWeekEnding(date);
 
   return useQuery({
     queryKey: ["weekly_review", userId, weekEnding],

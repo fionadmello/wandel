@@ -94,4 +94,27 @@ describe("useWeeklyReview", () => {
     expect(result.current.fetchStatus).toBe("idle");
     expect(mockMaybeSingle).not.toHaveBeenCalled();
   });
+
+  it("queries the correct week when a specific date is provided", async () => {
+    mockMaybeSingle.mockResolvedValue({ data: null, error: null });
+
+    // 2026-05-18 is Monday — week ending is 2026-05-24
+    const { result } = renderHook(
+      () => useWeeklyReview("user-1", new Date(2026, 4, 18)),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(mockMaybeSingle).toHaveBeenCalled();
+  });
+
+  it("does not run when userId is empty, even with a date provided", () => {
+    const { result } = renderHook(
+      () => useWeeklyReview("", new Date(2026, 4, 18)),
+      { wrapper },
+    );
+
+    expect(result.current.fetchStatus).toBe("idle");
+    expect(mockMaybeSingle).not.toHaveBeenCalled();
+  });
 });

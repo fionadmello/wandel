@@ -1,5 +1,5 @@
 import { useSearch } from "@tanstack/react-router";
-import { format, isSunday } from "date-fns";
+import { format, isSunday, parseISO } from "date-fns";
 import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
@@ -34,7 +34,6 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
     null,
   );
   const isToday = logDate === format(new Date(), "yyyy-MM-dd");
-  const isSundayToday = isSunday(new Date());
 
   const profileQuery = useProfile(userId);
   const qualitiesQuery = useProfileQualities(userId);
@@ -43,7 +42,7 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
   const buildObsQuery = useTodayBuildObservations(userId);
   const breakHabitsQuery = useBreakHabits(userId);
   const buildHabitsQuery = useBuildHabits(userId);
-  const weeklyReviewQuery = useWeeklyReview(userId);
+  const weeklyReviewQuery = useWeeklyReview(userId, parseISO(logDate));
 
   const reminder = useReminderRotation(userId);
   const marked = !!engineMarkQuery.data;
@@ -91,7 +90,7 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
 
         <EngineSection userId={userId} marked={marked} date={logDate} />
 
-        {isToday && isSundayToday && (
+        {isSunday(parseISO(logDate)) && (
           <WeeklyReviewPrompt review={weeklyReview} />
         )}
 
