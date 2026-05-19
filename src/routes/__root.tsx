@@ -11,7 +11,7 @@ import { TabBar } from "@/components/layout/TabBar";
 import { ProtocolOrchestrator } from "@/features/protocols/ProtocolOrchestrator";
 import { supabase } from "@/lib/supabase";
 
-const CHROME_HIDDEN_ROUTES = ["/auth", "/setup"];
+const CHROME_HIDDEN_ROUTES = ["/auth", "/setup", "/review"];
 
 function RootLayout() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
