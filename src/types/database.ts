@@ -288,8 +288,7 @@ export interface Database {
           user_id: string;
           week_ending: string;
           engine_response: string | null;
-          quality_added: string | null;
-          coaching_notes: string | null;
+          pride_note: string | null;
           self_rated_consistency: number | null;
           created_at: string;
         };
@@ -298,14 +297,12 @@ export interface Database {
           user_id: string;
           week_ending: string;
           engine_response?: string | null;
-          quality_added?: string | null;
-          coaching_notes?: string | null;
+          pride_note?: string | null;
           self_rated_consistency?: number | null;
         };
         Update: {
           engine_response?: string | null;
-          quality_added?: string | null;
-          coaching_notes?: string | null;
+          pride_note?: string | null;
           self_rated_consistency?: number | null;
         };
         Relationships: [];

@@ -23,8 +23,7 @@ const REVIEW: WeeklyReview = {
   user_id: "user-1",
   week_ending: "2026-05-17",
   engine_response: null,
-  quality_added: null,
-  coaching_notes: null,
+  pride_note: null,
   self_rated_consistency: null,
   created_at: "2026-05-17T10:00:00Z",
 };
