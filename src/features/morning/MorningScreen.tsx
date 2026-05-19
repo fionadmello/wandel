@@ -1,5 +1,5 @@
 import { useSearch } from "@tanstack/react-router";
-import { format } from "date-fns";
+import { format, isSunday } from "date-fns";
 import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
@@ -15,11 +15,13 @@ import { useProfile, useProfileQualities } from "@/hooks/useProfile";
 import { useReminderRotation } from "@/hooks/useReminderRotation";
 import { useSession } from "@/hooks/useSession";
 import { useTodayBuildObservations } from "@/hooks/useTodayBuildObservations";
+import { useWeeklyReview } from "@/hooks/useWeeklyReview";
 
 import { AtAGlance } from "./AtAGlance";
 import { EngineSection } from "./EngineSection";
 import { MorningDecorations } from "./MorningDecorations";
 import { QualitiesCard } from "./QualitiesCard";
+import { WeeklyReviewPrompt } from "./WeeklyReviewPrompt";
 
 interface MorningContentProps {
   userId: string;
@@ -32,6 +34,7 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
     null,
   );
   const isToday = logDate === format(new Date(), "yyyy-MM-dd");
+  const isSundayToday = isSunday(new Date());
 
   const profileQuery = useProfile(userId);
   const qualitiesQuery = useProfileQualities(userId);
@@ -40,6 +43,7 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
   const buildObsQuery = useTodayBuildObservations(userId);
   const breakHabitsQuery = useBreakHabits(userId);
   const buildHabitsQuery = useBuildHabits(userId);
+  const weeklyReviewQuery = useWeeklyReview(userId);
 
   const reminder = useReminderRotation(userId);
   const marked = !!engineMarkQuery.data;
@@ -47,6 +51,7 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
   const qualities = qualitiesQuery.data ?? [];
   const breakObsCount = breakObsQuery.data?.length ?? 0;
   const hasBuildObs = (buildObsQuery.data?.length ?? 0) > 0;
+  const weeklyReview = weeklyReviewQuery.data ?? null;
 
   const activeBreakHabits = (breakHabitsQuery.data ?? [])
     .filter((h) => h.status === "active")
@@ -61,18 +66,6 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
       <div className="flex flex-col px-6 pt-6 gap-6 relative">
         <DateSelector value={logDate} onChange={setLogDate} />
 
-        {reminder && <ReminderCard text={reminder} />}
-
-        {whyStatement && (
-          <p className="font-serif italic text-[15px] text-violet leading-[1.7]">
-            {whyStatement}
-          </p>
-        )}
-
-        <QualitiesCard qualities={qualities} />
-
-        <EngineSection userId={userId} marked={marked} date={logDate} />
-
         {isToday &&
           (activeBreakHabits.length > 0 || activeBuildHabits.length > 0) && (
             <AtAGlance
@@ -85,6 +78,22 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
               }
             />
           )}
+
+        {reminder && <ReminderCard text={reminder} />}
+
+        {whyStatement && (
+          <p className="font-serif italic text-[15px] text-violet leading-[1.7]">
+            {whyStatement}
+          </p>
+        )}
+
+        <QualitiesCard qualities={qualities} />
+
+        <EngineSection userId={userId} marked={marked} date={logDate} />
+
+        {isToday && isSundayToday && (
+          <WeeklyReviewPrompt review={weeklyReview} />
+        )}
 
         {slippingHabit && (
           <HabitSlipModal
