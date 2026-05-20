@@ -55,7 +55,7 @@ export function ReviewHistoryRecord({
         <div className="flex flex-col gap-7 pb-8">
           {review.engine_response && (
             <div className="flex flex-col gap-1">
-              <p className="font-sans text-[11px] text-muted tracking-wider">
+              <p className="font-sans text-[11px] text-violet tracking-wider">
                 Mirror
               </p>
               <p className="font-serif text-[17px] text-plum leading-relaxed">
@@ -66,7 +66,7 @@ export function ReviewHistoryRecord({
 
           {review.pride_note && (
             <div className="flex flex-col gap-1">
-              <p className="font-sans text-[11px] text-muted tracking-wider">
+              <p className="font-sans text-[11px] text-violet tracking-wider">
                 Standing up
               </p>
               <p className="font-serif text-[17px] text-plum leading-relaxed">
@@ -80,7 +80,7 @@ export function ReviewHistoryRecord({
             if (!habit) return null;
             return (
               <div key={hr.id} className="flex flex-col gap-1">
-                <p className="font-sans text-[11px] text-muted tracking-wider">
+                <p className="font-sans text-[11px] text-violet tracking-wider">
                   {habit.name}
                 </p>
                 {hr.what_done && (
@@ -94,7 +94,7 @@ export function ReviewHistoryRecord({
 
           {review.self_rated_consistency !== null && (
             <div className="flex flex-col gap-1">
-              <p className="font-sans text-[11px] text-muted tracking-wider">
+              <p className="font-sans text-[11px] text-violet tracking-wider">
                 Consistency
               </p>
               <p className="font-sans text-sm text-plum">

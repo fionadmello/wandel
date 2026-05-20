@@ -160,9 +160,6 @@ export function ReviewStepper({
   if (phase === "engine") {
     return (
       <div className="flex flex-col gap-6 px-6 pt-3 pb-8">
-        <p className="font-sans text-[11px] text-muted uppercase tracking-wider">
-          {format(parseISO(weekEnding), "d MMM yyyy")}
-        </p>
         <p className="font-serif text-[22px] leading-snug text-plum">
           How did the mirror practice feel this week?
         </p>

@@ -60,7 +60,10 @@ function ReviewContent({ userId }: { userId: string }) {
         </div>
 
         {unreviewedSundays.length > 0 && (
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-1">
+            <p className="font-sans text-[11px] text-amber uppercase tracking-wider">
+              To review
+            </p>
             {unreviewedSundays.map((weekEnding) => (
               <div key={weekEnding} className="flex flex-col">
                 <button
@@ -72,27 +75,32 @@ function ReviewContent({ userId }: { userId: string }) {
                   }
                   className="flex items-center justify-between py-3"
                 >
-                  <div className="flex flex-col items-start gap-0.5">
-                    <p className="font-sans text-sm text-soft">
-                      Week ending {format(parseISO(weekEnding), "d MMM yyyy")}
-                    </p>
-                    <p className="font-sans text-xs text-muted">
-                      Not yet reviewed
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber shrink-0" />
+                    <div className="flex flex-col items-start gap-0.5">
+                      <p className="font-sans text-sm text-plum">
+                        {format(parseISO(weekEnding), "d MMM yyyy")}
+                      </p>
+                      <p className="font-sans text-xs text-muted">
+                        Not yet reviewed
+                      </p>
+                    </div>
                   </div>
-                  <p className="font-sans text-sm text-plum">→</p>
+                  <p className="font-sans text-sm text-amber">→</p>
                 </button>
 
                 {expandedWeekEnding === weekEnding && (
-                  <ReviewStepper
-                    userId={userId}
-                    weekEnding={weekEnding}
-                    breakHabits={breakHabits}
-                    buildHabits={buildHabits}
-                    standingUpEntries={standingUpEntries}
-                    onComplete={() => setExpandedWeekEnding(null)}
-                    onCancel={() => setExpandedWeekEnding(null)}
-                  />
+                  <div className="border-l-2 border-amber ml-[0.1875rem] pl-5">
+                    <ReviewStepper
+                      userId={userId}
+                      weekEnding={weekEnding}
+                      breakHabits={breakHabits}
+                      buildHabits={buildHabits}
+                      standingUpEntries={standingUpEntries}
+                      onComplete={() => setExpandedWeekEnding(null)}
+                      onCancel={() => setExpandedWeekEnding(null)}
+                    />
+                  </div>
                 )}
               </div>
             ))}
@@ -101,7 +109,7 @@ function ReviewContent({ userId }: { userId: string }) {
 
         {allReviews.length > 0 && (
           <div className="flex flex-col gap-2">
-            <p className="font-sans text-xs text-muted uppercase tracking-wide">
+            <p className="font-sans text-[11px] text-violet uppercase tracking-wider">
               Past reviews
             </p>
             {allReviews.map((review) => (
