@@ -15,7 +15,7 @@ import { useProfile, useProfileQualities } from "@/hooks/useProfile";
 import { useReminderRotation } from "@/hooks/useReminderRotation";
 import { useSession } from "@/hooks/useSession";
 import { useTodayBuildObservations } from "@/hooks/useTodayBuildObservations";
-import { useWeeklyReview } from "@/hooks/useWeeklyReview";
+import { currentWeekEnding, useWeeklyReview } from "@/hooks/useWeeklyReview";
 
 import { AtAGlance } from "./AtAGlance";
 import { EngineSection } from "./EngineSection";
@@ -51,6 +51,7 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
   const breakObsCount = breakObsQuery.data?.length ?? 0;
   const hasBuildObs = (buildObsQuery.data?.length ?? 0) > 0;
   const weeklyReview = weeklyReviewQuery.data ?? null;
+  const weekEnding = currentWeekEnding(parseISO(logDate));
 
   const activeBreakHabits = (breakHabitsQuery.data ?? [])
     .filter((h) => h.status === "active")
@@ -91,7 +92,7 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
         <EngineSection userId={userId} marked={marked} date={logDate} />
 
         {isSunday(parseISO(logDate)) && (
-          <WeeklyReviewPrompt review={weeklyReview} />
+          <WeeklyReviewPrompt review={weeklyReview} weekEnding={weekEnding} />
         )}
 
         {slippingHabit && (

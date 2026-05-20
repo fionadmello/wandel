@@ -6,9 +6,13 @@ import type { WeeklyReview } from "@/types/database";
 
 interface WeeklyReviewPromptProps {
   review: WeeklyReview | null;
+  weekEnding: string;
 }
 
-export function WeeklyReviewPrompt({ review }: WeeklyReviewPromptProps) {
+export function WeeklyReviewPrompt({
+  review,
+  weekEnding,
+}: WeeklyReviewPromptProps) {
   if (review) {
     return (
       <div className="flex items-center gap-2">
@@ -21,7 +25,7 @@ export function WeeklyReviewPrompt({ review }: WeeklyReviewPromptProps) {
   }
 
   return (
-    <Link to="/review">
+    <Link to="/review" search={{ weekEnding }}>
       <p className="font-serif italic text-[17px] text-plum leading-snug">
         Weekly review
       </p>
