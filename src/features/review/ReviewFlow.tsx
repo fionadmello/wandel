@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAllStandingUpEntries } from "@/hooks/useStandingUpLog";
 import { useSubmitWeeklyReview } from "@/hooks/useSubmitWeeklyReview";
 import { useWeeklyConsistency } from "@/hooks/useWeeklyConsistency";
-import { currentWeekEnding } from "@/hooks/useWeeklyReview";
+import { mostRecentSunday } from "@/hooks/useWeeklyReview";
 import type { Habit } from "@/types/database";
 import type { HabitResponse, ReviewFormState } from "@/types/review";
 
@@ -41,7 +41,7 @@ export function ReviewFlow({
   onComplete,
   onCancel,
 }: ReviewFlowProps) {
-  const weekEnding = currentWeekEnding();
+  const weekEnding = mostRecentSunday();
   const weekStart = format(subDays(parseISO(weekEnding), 6), "yyyy-MM-dd");
 
   const [formState, setFormState] = useState<ReviewFormState>({

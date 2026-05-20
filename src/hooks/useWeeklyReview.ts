@@ -1,11 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { endOfWeek, format } from "date-fns";
+import { endOfWeek, format, subDays } from "date-fns";
 
 import { supabase } from "@/lib/supabase";
 import type { WeeklyReview } from "@/types/database";
 
 export function currentWeekEnding(today: Date = new Date()): string {
   return format(endOfWeek(today, { weekStartsOn: 1 }), "yyyy-MM-dd");
+}
+
+// Most recent Sunday ≤ today (today itself when today is Sunday)
+export function mostRecentSunday(today: Date = new Date()): string {
+  return format(subDays(today, today.getDay()), "yyyy-MM-dd");
 }
 
 export function useWeeklyReview(userId: string, date?: Date) {

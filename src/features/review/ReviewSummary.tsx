@@ -1,7 +1,7 @@
 import { format, isSunday, parseISO } from "date-fns";
 
 import { useWeeklyConsistency } from "@/hooks/useWeeklyConsistency";
-import { currentWeekEnding } from "@/hooks/useWeeklyReview";
+import { mostRecentSunday } from "@/hooks/useWeeklyReview";
 import { useWeeklyReviewHistory } from "@/hooks/useWeeklyReviewHistory";
 import type { Habit } from "@/types/database";
 
@@ -18,7 +18,7 @@ export function ReviewSummary({
   buildHabits,
   onStartReview,
 }: ReviewSummaryProps) {
-  const weekEnding = currentWeekEnding();
+  const weekEnding = mostRecentSunday();
   const isSundayToday = isSunday(new Date());
 
   const historyQuery = useWeeklyReviewHistory(userId);
@@ -37,13 +37,15 @@ export function ReviewSummary({
 
   return (
     <div className="flex flex-col gap-8">
-      {!thisWeek && isSundayToday && (
+      {!thisWeek && (
         <button
           type="button"
           onClick={onStartReview}
           className="font-serif italic text-[17px] text-plum text-left leading-snug"
         >
-          Start this week's review →
+          {isSundayToday
+            ? "Start this week's review →"
+            : `Review week ending ${format(parseISO(weekEnding), "d MMM")} →`}
         </button>
       )}
 
