@@ -411,6 +411,129 @@ export interface Database {
         };
         Relationships: [];
       };
+      practice_collection: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          description: string;
+          is_default: boolean;
+          active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          description: string;
+          is_default?: boolean;
+          active?: boolean;
+        };
+        Update: {
+          name?: string;
+          description?: string;
+          active?: boolean;
+        };
+        Relationships: [];
+      };
+      daily_intentions: {
+        Row: {
+          user_id: string;
+          date: string;
+          hard_task: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          date: string;
+          hard_task?: string | null;
+        };
+        Update: {
+          hard_task?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      hard_things_log: {
+        Row: {
+          id: string;
+          user_id: string;
+          date: string;
+          timestamp: string;
+          what: string;
+          before: number;
+          during: number;
+          after: number;
+          note: string | null;
+          linked_intention: boolean;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          date: string;
+          timestamp?: string;
+          what: string;
+          before: number;
+          during: number;
+          after: number;
+          note?: string | null;
+          linked_intention?: boolean;
+        };
+        Update: never;
+        Relationships: [];
+      };
+      self_love_log: {
+        Row: {
+          id: string;
+          user_id: string;
+          date: string;
+          timestamp: string;
+          practice: string;
+          practice_id: string;
+          felt: number;
+          note: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          date: string;
+          timestamp?: string;
+          practice: string;
+          practice_id: string;
+          felt: number;
+          note?: string | null;
+        };
+        Update: never;
+        Relationships: [];
+      };
+      self_worth_evidence: {
+        Row: {
+          id: string;
+          user_id: string;
+          date: string;
+          timestamp: string;
+          title: string;
+          situation: string;
+          what_i_did_well: string;
+          tags: string[];
+          archived: boolean;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          date: string;
+          timestamp?: string;
+          title: string;
+          situation: string;
+          what_i_did_well: string;
+          tags?: string[];
+          archived?: boolean;
+        };
+        Update: {
+          archived?: boolean;
+        };
+        Relationships: [];
+      };
     };
   };
 }
