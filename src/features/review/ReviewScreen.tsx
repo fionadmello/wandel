@@ -39,7 +39,7 @@ function ReviewContent({ userId }: { userId: string }) {
   const standingUpEntries = standingUpQuery.data ?? [];
 
   const reviewedWeekEndings = allReviews.map((r) => r.week_ending);
-  const unreviewedSundays = computeUnreviewedSundays(reviewedWeekEndings);
+  const unreviewedSundays = computeUnreviewedSundays(reviewedWeekEndings, 3);
 
   const expandedHistoryReview =
     allReviews.find((r) => r.id === expandedHistoryId) ?? null;
