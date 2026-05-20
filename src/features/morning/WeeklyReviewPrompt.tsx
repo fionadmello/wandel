@@ -1,37 +1,81 @@
 import { Link } from "@tanstack/react-router";
 import { format, parseISO } from "date-fns";
-import { Check } from "lucide-react";
 
+import { ConsistencyDots } from "@/components/ui/ConsistencyDots";
 import type { WeeklyReview } from "@/types/database";
 
 interface WeeklyReviewPromptProps {
-  review: WeeklyReview | null;
-  weekEnding: string;
+  mostRecentReview: WeeklyReview | null;
+  isSundayToday: boolean;
+  isCurrentWeekReviewed: boolean;
+  mostRecentSundayStr: string;
 }
 
 export function WeeklyReviewPrompt({
-  review,
-  weekEnding,
+  mostRecentReview,
+  isSundayToday,
+  isCurrentWeekReviewed,
+  mostRecentSundayStr,
 }: WeeklyReviewPromptProps) {
-  if (review) {
+  if (isSundayToday && !isCurrentWeekReviewed) {
     return (
-      <div className="flex items-center gap-2">
-        <p className="font-sans text-sm text-muted">
-          Weekly review · {format(parseISO(review.week_ending), "d MMM")}
+      <div className="bg-card rounded-2xl px-5 py-4 flex flex-col gap-3">
+        <p className="font-sans text-[11px] text-amber uppercase tracking-wider">
+          Weekly review
         </p>
-        <Check size={14} className="text-teal" />
+        <p className="font-serif text-[18px] text-plum leading-snug">
+          This week deserves a moment of reflection.
+        </p>
+        <Link
+          to="/review"
+          search={{ weekEnding: mostRecentSundayStr }}
+          className="font-sans text-[13px] text-amber"
+        >
+          Start review →
+        </Link>
+      </div>
+    );
+  }
+
+  if (mostRecentReview) {
+    return (
+      <div className="bg-card rounded-2xl px-5 py-4 flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <p className="font-sans text-[11px] text-violet uppercase tracking-wider">
+            Weekly review
+          </p>
+          <Link to="/review" className="font-sans text-[13px] text-violet">
+            View all →
+          </Link>
+        </div>
+        <p className="font-serif italic text-[16px] text-plum">
+          {format(parseISO(mostRecentReview.week_ending), "d MMM yyyy")}
+        </p>
+        {mostRecentReview.self_rated_consistency !== null && (
+          <ConsistencyDots rating={mostRecentReview.self_rated_consistency} />
+        )}
+        {mostRecentReview.engine_response && (
+          <p className="font-sans text-[12px] text-muted line-clamp-2">
+            {mostRecentReview.engine_response}
+          </p>
+        )}
       </div>
     );
   }
 
   return (
-    <Link to="/review" search={{ weekEnding }}>
-      <p className="font-serif italic text-[17px] text-plum leading-snug">
-        Weekly review
+    <div className="bg-card rounded-2xl px-5 py-4 flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <p className="font-sans text-[11px] text-muted uppercase tracking-wider">
+          Weekly review
+        </p>
+        <Link to="/review" className="font-sans text-[13px] text-violet">
+          View →
+        </Link>
+      </div>
+      <p className="font-sans text-[13px] text-muted">
+        Your weekly reflections will appear here.
       </p>
-      <p className="font-sans text-sm text-muted mt-1">
-        Take a few minutes to reflect on the week.
-      </p>
-    </Link>
+    </div>
   );
 }

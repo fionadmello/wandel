@@ -1,5 +1,5 @@
 import { useSearch } from "@tanstack/react-router";
-import { format, isSunday, parseISO } from "date-fns";
+import { format, isSunday } from "date-fns";
 import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
@@ -15,7 +15,8 @@ import { useProfile, useProfileQualities } from "@/hooks/useProfile";
 import { useReminderRotation } from "@/hooks/useReminderRotation";
 import { useSession } from "@/hooks/useSession";
 import { useTodayBuildObservations } from "@/hooks/useTodayBuildObservations";
-import { currentWeekEnding, useWeeklyReview } from "@/hooks/useWeeklyReview";
+import { mostRecentSunday } from "@/hooks/useWeeklyReview";
+import { useWeeklyReviewHistory } from "@/hooks/useWeeklyReviewHistory";
 
 import { AtAGlance } from "./AtAGlance";
 import { EngineSection } from "./EngineSection";
@@ -42,7 +43,7 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
   const buildObsQuery = useTodayBuildObservations(userId);
   const breakHabitsQuery = useBreakHabits(userId);
   const buildHabitsQuery = useBuildHabits(userId);
-  const weeklyReviewQuery = useWeeklyReview(userId, parseISO(logDate));
+  const reviewHistoryQuery = useWeeklyReviewHistory(userId);
 
   const reminder = useReminderRotation(userId);
   const marked = !!engineMarkQuery.data;
@@ -50,8 +51,12 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
   const qualities = qualitiesQuery.data ?? [];
   const breakObsCount = breakObsQuery.data?.length ?? 0;
   const hasBuildObs = (buildObsQuery.data?.length ?? 0) > 0;
-  const weeklyReview = weeklyReviewQuery.data ?? null;
-  const weekEnding = currentWeekEnding(parseISO(logDate));
+
+  const isSundayToday = isSunday(new Date());
+  const mostRecentSundayStr = mostRecentSunday();
+  const mostRecentReview = reviewHistoryQuery.data?.[0] ?? null;
+  const isCurrentWeekReviewed =
+    mostRecentReview?.week_ending === mostRecentSundayStr;
 
   const activeBreakHabits = (breakHabitsQuery.data ?? [])
     .filter((h) => h.status === "active")
@@ -91,9 +96,12 @@ function MorningContent({ userId, initialLogDate }: MorningContentProps) {
 
         <EngineSection userId={userId} marked={marked} date={logDate} />
 
-        {isSunday(parseISO(logDate)) && (
-          <WeeklyReviewPrompt review={weeklyReview} weekEnding={weekEnding} />
-        )}
+        <WeeklyReviewPrompt
+          mostRecentReview={mostRecentReview}
+          isSundayToday={isSundayToday}
+          isCurrentWeekReviewed={isCurrentWeekReviewed}
+          mostRecentSundayStr={mostRecentSundayStr}
+        />
 
         {slippingHabit && (
           <HabitSlipModal
