@@ -3,6 +3,7 @@ import { format, parseISO } from "date-fns";
 import { useState } from "react";
 
 import { ScreenWrap } from "@/components/layout/ScreenWrap";
+import { Divider } from "@/components/ui/Divider";
 import { useBreakHabits } from "@/hooks/useBreakHabits";
 import { useBuildHabits } from "@/hooks/useBuildHabits";
 import { useSession } from "@/hooks/useSession";
@@ -107,8 +108,12 @@ function ReviewContent({ userId }: { userId: string }) {
           </div>
         )}
 
+        {unreviewedSundays.length > 0 && allReviews.length > 0 && (
+          <Divider className="my-0" />
+        )}
+
         {allReviews.length > 0 && (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <p className="font-sans text-[11px] text-violet uppercase tracking-wider">
               Past reviews
             </p>

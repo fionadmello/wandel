@@ -12,6 +12,28 @@ interface ReviewHistoryRecordProps {
   onToggle: () => void;
 }
 
+function ConsistencyDots({ rating }: { rating: number }) {
+  return (
+    <div className="flex gap-1 items-center">
+      <span
+        className={`w-2 h-2 rounded-full ${rating >= 1 ? "bg-teal" : "bg-border"}`}
+      />
+      <span
+        className={`w-2 h-2 rounded-full ${rating >= 2 ? "bg-teal" : "bg-border"}`}
+      />
+      <span
+        className={`w-2 h-2 rounded-full ${rating >= 3 ? "bg-teal" : "bg-border"}`}
+      />
+      <span
+        className={`w-2 h-2 rounded-full ${rating >= 4 ? "bg-teal" : "bg-border"}`}
+      />
+      <span
+        className={`w-2 h-2 rounded-full ${rating >= 5 ? "bg-teal" : "bg-border"}`}
+      />
+    </div>
+  );
+}
+
 export function ReviewHistoryRecord({
   review,
   habits,
@@ -24,35 +46,34 @@ export function ReviewHistoryRecord({
   const buildHabits = habits.filter((h) => h.category === "build");
 
   return (
-    <div className="flex flex-col border-b border-border last:border-b-0">
+    <div className="bg-card rounded-2xl px-5">
       <button
         type="button"
         onClick={onToggle}
-        className="flex items-center justify-between py-4 w-full"
+        className="flex items-start justify-between py-4 w-full gap-4"
       >
-        <div className="flex flex-col items-start gap-1">
-          <p className="font-serif italic text-[17px] text-plum">
+        <div className="flex flex-col items-start gap-2">
+          <p className="font-serif italic text-[18px] text-plum leading-snug">
             {format(parseISO(review.week_ending), "d MMM yyyy")}
           </p>
-          {review.engine_response ? (
-            <p className="font-sans text-[12px] text-muted line-clamp-1">
+          {review.self_rated_consistency !== null && (
+            <ConsistencyDots rating={review.self_rated_consistency} />
+          )}
+          {review.engine_response && (
+            <p className="font-sans text-[12px] text-muted line-clamp-2 text-left">
               {review.engine_response}
             </p>
-          ) : review.self_rated_consistency !== null ? (
-            <p className="font-sans text-[12px] text-muted">
-              Consistency {review.self_rated_consistency}/5
-            </p>
-          ) : null}
+          )}
         </div>
         {isExpanded ? (
-          <ChevronUp size={16} className="text-muted shrink-0 ml-4" />
+          <ChevronUp size={16} className="text-muted shrink-0 mt-1" />
         ) : (
-          <ChevronDown size={16} className="text-muted shrink-0 ml-4" />
+          <ChevronDown size={16} className="text-muted shrink-0 mt-1" />
         )}
       </button>
 
       {isExpanded && (
-        <div className="flex flex-col gap-7 pb-8">
+        <div className="flex flex-col gap-7 pb-6 border-t border-border pt-5">
           {review.engine_response && (
             <div className="flex flex-col gap-1">
               <p className="font-sans text-[11px] text-violet tracking-wider">
@@ -93,26 +114,29 @@ export function ReviewHistoryRecord({
           })}
 
           {review.self_rated_consistency !== null && (
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2">
               <p className="font-sans text-[11px] text-violet tracking-wider">
                 Consistency
               </p>
-              <p className="font-sans text-sm text-plum">
-                Self-rated {review.self_rated_consistency}/5
-              </p>
+              <div className="flex items-center gap-3">
+                <ConsistencyDots rating={review.self_rated_consistency} />
+                <p className="font-sans text-xs text-muted">
+                  {review.self_rated_consistency}/5 self-rated
+                </p>
+              </div>
               {consistencyData && (
                 <div className="flex flex-col gap-1 mt-1">
-                  <p className="font-sans text-xs text-soft">
+                  <p className="font-sans text-[13px] text-plum">
                     Mirror — {consistencyData.engineMarked}/7 days
                   </p>
                   {buildHabits.map((h) => (
-                    <p key={h.id} className="font-sans text-xs text-soft">
+                    <p key={h.id} className="font-sans text-[13px] text-plum">
                       {h.name} —{" "}
                       {consistencyData.buildObsDaysByHabit[h.id] ?? 0}/7 days
                     </p>
                   ))}
                   {breakHabits.map((h) => (
-                    <p key={h.id} className="font-sans text-xs text-soft">
+                    <p key={h.id} className="font-sans text-[13px] text-plum">
                       {h.name} —{" "}
                       {7 - (consistencyData.breakObsDaysByHabit[h.id] ?? 0)}/7
                       clean days
