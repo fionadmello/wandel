@@ -23,11 +23,10 @@ function countDistinctDaysByHabit(
 }
 
 export function useWeeklyConsistency(userId: string, weekEnding: string) {
-  const start = weekStart(weekEnding);
-
   return useQuery({
     queryKey: ["weekly_consistency", userId, weekEnding],
     queryFn: async (): Promise<WeeklyConsistencyData> => {
+      const start = weekStart(weekEnding);
       const [engineResult, breakResult, buildResult] = await Promise.all([
         supabase
           .from("engine_marks")
