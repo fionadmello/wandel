@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   useMonthBreakObservations,
   useMonthBuildObservations,
+  useMonthEngineActivity,
   useMonthEngineMarks,
 } from "@/hooks/useMonthData";
 
@@ -166,6 +167,74 @@ describe("useMonthBuildObservations", () => {
 
     const { result } = renderHook(
       () => useMonthBuildObservations("user-1", 2026, 4),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+});
+
+describe("useMonthEngineActivity", () => {
+  it("returns deduplicated union of dates across all three tables", async () => {
+    mockQuery
+      .mockReturnValueOnce(
+        Promise.resolve({
+          data: [{ date: "2026-04-01" }, { date: "2026-04-05" }],
+          error: null,
+        }),
+      )
+      .mockReturnValueOnce(
+        Promise.resolve({
+          data: [{ date: "2026-04-05" }, { date: "2026-04-10" }],
+          error: null,
+        }),
+      )
+      .mockReturnValueOnce(
+        Promise.resolve({
+          data: [{ date: "2026-04-15" }],
+          error: null,
+        }),
+      );
+
+    const { result } = renderHook(
+      () => useMonthEngineActivity("user-1", 2026, 4),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual([
+      "2026-04-01",
+      "2026-04-05",
+      "2026-04-10",
+      "2026-04-15",
+    ]);
+  });
+
+  it("returns empty array when all three tables return empty", async () => {
+    mockQuery
+      .mockReturnValueOnce(Promise.resolve({ data: [], error: null }))
+      .mockReturnValueOnce(Promise.resolve({ data: [], error: null }))
+      .mockReturnValueOnce(Promise.resolve({ data: [], error: null }));
+
+    const { result } = renderHook(
+      () => useMonthEngineActivity("user-1", 2026, 4),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual([]);
+  });
+
+  it("throws when the first table errors", async () => {
+    mockQuery
+      .mockReturnValueOnce(
+        Promise.resolve({ data: null, error: { message: "DB error" } }),
+      )
+      .mockReturnValueOnce(Promise.resolve({ data: [], error: null }))
+      .mockReturnValueOnce(Promise.resolve({ data: [], error: null }));
+
+    const { result } = renderHook(
+      () => useMonthEngineActivity("user-1", 2026, 4),
       { wrapper },
     );
 

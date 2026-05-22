@@ -447,6 +447,7 @@ export interface Database {
           user_id: string;
           date: string;
           hard_task?: string | null;
+          updated_at?: string;
         };
         Update: {
           hard_task?: string | null;
