@@ -101,6 +101,57 @@
     border: none;
     cursor: pointer;
   }
+
+  .panel-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3px;
+    border-radius: 9999px;
+    outline: none;
+  }
+
+  .panel-slider-violet {
+    background: linear-gradient(
+      to right,
+      var(--color-violet) var(--panel-fill, 0%),
+      var(--color-soft) var(--panel-fill, 0%)
+    );
+  }
+
+  .panel-slider-amber {
+    background: linear-gradient(
+      to right,
+      var(--color-amber) var(--panel-fill, 0%),
+      var(--color-soft) var(--panel-fill, 0%)
+    );
+  }
+
+  .panel-slider-teal {
+    background: linear-gradient(
+      to right,
+      var(--color-teal) var(--panel-fill, 0%),
+      var(--color-soft) var(--panel-fill, 0%)
+    );
+  }
+
+  .panel-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-plum);
+    cursor: pointer;
+    margin-top: -7px;
+  }
+
+  .panel-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-plum);
+    border: none;
+    cursor: pointer;
+  }
 }
 
 @layer base {
