@@ -33,7 +33,12 @@ export function PanelSelfLove({ userId, date }: PanelSelfLoveProps) {
     ) {
       seedDefaults.mutate();
     }
-  }, [practices, seedDefaults]);
+  }, [
+    practices,
+    seedDefaults.isPending,
+    seedDefaults.isSuccess,
+    seedDefaults.mutate,
+  ]);
 
   const displayed = entries.slice(0, 4);
   const overflow = entries.length - 4;

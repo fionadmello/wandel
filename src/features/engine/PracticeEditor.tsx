@@ -23,7 +23,13 @@ export function PracticeEditor({ userId, onClose }: PracticeEditorProps) {
   const remove = useDeletePractice(userId);
 
   function handleToggle(practice: Practice) {
-    save.mutate({ ...practice, active: !practice.active });
+    save.mutate({
+      id: practice.id,
+      name: practice.name,
+      description: practice.description,
+      is_default: practice.is_default,
+      active: !practice.active,
+    });
   }
 
   function handleConfirmDelete(id: string) {
@@ -48,6 +54,8 @@ export function PracticeEditor({ userId, onClose }: PracticeEditorProps) {
       },
     );
   }
+
+  const addDisabled = !newName.trim() || save.isPending;
 
   return (
     <ProtocolModal onClose={onClose}>
@@ -141,10 +149,8 @@ export function PracticeEditor({ userId, onClose }: PracticeEditorProps) {
           <button
             type="button"
             onClick={handleAdd}
-            disabled={!newName.trim() || save.isPending}
-            className={`w-full bg-amber text-canvas rounded-2xl py-3 font-sans text-[13px] font-medium transition-opacity ${
-              !newName.trim() || save.isPending ? "opacity-50" : ""
-            }`}
+            disabled={addDisabled}
+            className={`w-full bg-amber text-canvas rounded-2xl py-3 font-sans text-[13px] font-medium transition-opacity ${addDisabled ? "opacity-50" : ""}`}
           >
             Add
           </button>
