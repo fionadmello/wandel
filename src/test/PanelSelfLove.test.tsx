@@ -3,8 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PanelSelfLove } from "@/features/engine/PanelSelfLove";
-import { usePractices, useSeedDefaultPractices } from "@/hooks/usePractices";
-import { useSelfLoveEntries } from "@/hooks/useSelfLove";
 import type { Practice, SelfLoveEntry } from "@/types/engine";
 
 const PRACTICE: Practice = {
@@ -30,41 +28,30 @@ function makeEntry(n: number): SelfLoveEntry {
   };
 }
 
+let entriesData: SelfLoveEntry[] = [];
+let practicesData: Practice[] = [PRACTICE];
 const mockSeedMutate = vi.fn();
 
 vi.mock("@/hooks/useSelfLove", () => ({
-  useSelfLoveEntries: vi.fn(() => ({ data: [] })),
-  useLogSelfLove: vi.fn(() => ({ mutate: vi.fn(), isPending: false })),
+  useSelfLoveEntries: () => ({ data: entriesData }),
+  useLogSelfLove: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 
 vi.mock("@/hooks/usePractices", () => ({
-  usePractices: vi.fn(() => ({ data: [PRACTICE] })),
-  useSeedDefaultPractices: vi.fn(() => ({
+  usePractices: () => ({ data: practicesData }),
+  useSeedDefaultPractices: () => ({
     mutate: mockSeedMutate,
     isPending: false,
     isSuccess: false,
-  })),
-  useSavePractice: vi.fn(() => ({ mutate: vi.fn(), isPending: false })),
-  useDeletePractice: vi.fn(() => ({ mutate: vi.fn(), isPending: false })),
+  }),
+  useSavePractice: () => ({ mutate: vi.fn(), isPending: false }),
+  useDeletePractice: () => ({ mutate: vi.fn(), isPending: false }),
 }));
-
-type EntriesResult = ReturnType<typeof useSelfLoveEntries>;
-type PracticesResult = ReturnType<typeof usePractices>;
-type SeedResult = ReturnType<typeof useSeedDefaultPractices>;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  vi.mocked(useSelfLoveEntries).mockReturnValue({
-    data: [],
-  } as unknown as EntriesResult);
-  vi.mocked(usePractices).mockReturnValue({
-    data: [PRACTICE],
-  } as unknown as PracticesResult);
-  vi.mocked(useSeedDefaultPractices).mockReturnValue({
-    mutate: mockSeedMutate,
-    isPending: false,
-    isSuccess: false,
-  } as unknown as SeedResult);
+  entriesData = [];
+  practicesData = [PRACTICE];
 });
 
 describe("PanelSelfLove", () => {
@@ -79,9 +66,7 @@ describe("PanelSelfLove", () => {
   });
 
   it("shows top 4 entries and not the 5th", () => {
-    vi.mocked(useSelfLoveEntries).mockReturnValue({
-      data: [1, 2, 3, 4, 5].map(makeEntry),
-    } as unknown as EntriesResult);
+    entriesData = [1, 2, 3, 4, 5].map(makeEntry);
     render(<PanelSelfLove userId="user-1" date="2026-05-27" />);
     expect(screen.getByText("Practice 1")).toBeTruthy();
     expect(screen.getByText("Practice 4")).toBeTruthy();
@@ -89,9 +74,7 @@ describe("PanelSelfLove", () => {
   });
 
   it("shows overflow line when more than 4 entries", () => {
-    vi.mocked(useSelfLoveEntries).mockReturnValue({
-      data: [1, 2, 3, 4, 5].map(makeEntry),
-    } as unknown as EntriesResult);
+    entriesData = [1, 2, 3, 4, 5].map(makeEntry);
     render(<PanelSelfLove userId="user-1" date="2026-05-27" />);
     expect(screen.getByText(/\+ 1 more entry/)).toBeTruthy();
   });
@@ -115,9 +98,7 @@ describe("PanelSelfLove", () => {
   });
 
   it("seeds defaults when practices list is empty on mount", () => {
-    vi.mocked(usePractices).mockReturnValue({
-      data: [],
-    } as unknown as PracticesResult);
+    practicesData = [];
     render(<PanelSelfLove userId="user-1" date="2026-05-27" />);
     expect(mockSeedMutate).toHaveBeenCalledOnce();
   });
