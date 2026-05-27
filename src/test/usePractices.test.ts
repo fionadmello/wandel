@@ -4,16 +4,18 @@ import React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  useDeletePractice,
   usePractices,
   useSavePractice,
   useSeedDefaultPractices,
 } from "@/hooks/usePractices";
 import type { Practice } from "@/types/engine";
 
-const { mockOrder, mockUpsert, mockSingle } = vi.hoisted(() => ({
+const { mockOrder, mockUpsert, mockSingle, mockDelete } = vi.hoisted(() => ({
   mockOrder: vi.fn(),
   mockUpsert: vi.fn(),
   mockSingle: vi.fn(),
+  mockDelete: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase", () => {
@@ -27,6 +29,7 @@ vi.mock("@/lib/supabase", () => {
   builder.eq = () => builder;
   builder.order = mockOrder;
   builder.upsert = () => upsertResult;
+  builder.delete = () => ({ eq: () => ({ eq: () => mockDelete() }) });
   return { supabase: { from: () => builder } };
 });
 
@@ -152,6 +155,36 @@ describe("useSavePractice", () => {
         is_default: true,
         active: true,
       });
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+});
+
+describe("useDeletePractice", () => {
+  it("resolves without throwing on success", async () => {
+    mockDelete.mockResolvedValue({ error: null });
+
+    const { result } = renderHook(() => useDeletePractice("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      await result.current.mutateAsync("p-1");
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  });
+
+  it("throws when delete errors", async () => {
+    mockDelete.mockResolvedValue({ error: { message: "DB error" } });
+
+    const { result } = renderHook(() => useDeletePractice("user-1"), {
+      wrapper,
+    });
+
+    await act(async () => {
+      result.current.mutate("p-1");
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
