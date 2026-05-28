@@ -14,6 +14,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as MorningRouteImport } from './routes/morning'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as EngineRouteImport } from './routes/engine'
 import { Route as BuildRouteImport } from './routes/build'
 import { Route as BreakRouteImport } from './routes/break'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -46,6 +47,11 @@ const MorningRoute = MorningRouteImport.update({
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EngineRoute = EngineRouteImport.update({
+  id: '/engine',
+  path: '/engine',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BuildRoute = BuildRouteImport.update({
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/break': typeof BreakRouteWithChildren
   '/build': typeof BuildRouteWithChildren
+  '/engine': typeof EngineRoute
   '/history': typeof HistoryRoute
   '/morning': typeof MorningRoute
   '/review': typeof ReviewRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/engine': typeof EngineRoute
   '/history': typeof HistoryRoute
   '/morning': typeof MorningRoute
   '/review': typeof ReviewRoute
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/break': typeof BreakRouteWithChildren
   '/build': typeof BuildRouteWithChildren
+  '/engine': typeof EngineRoute
   '/history': typeof HistoryRoute
   '/morning': typeof MorningRoute
   '/review': typeof ReviewRoute
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/break'
     | '/build'
+    | '/engine'
     | '/history'
     | '/morning'
     | '/review'
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/engine'
     | '/history'
     | '/morning'
     | '/review'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/break'
     | '/build'
+    | '/engine'
     | '/history'
     | '/morning'
     | '/review'
@@ -184,6 +196,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BreakRoute: typeof BreakRouteWithChildren
   BuildRoute: typeof BuildRouteWithChildren
+  EngineRoute: typeof EngineRoute
   HistoryRoute: typeof HistoryRoute
   MorningRoute: typeof MorningRoute
   ReviewRoute: typeof ReviewRoute
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/history'
       fullPath: '/history'
       preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/engine': {
+      id: '/engine'
+      path: '/engine'
+      fullPath: '/engine'
+      preLoaderRoute: typeof EngineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/build': {
@@ -316,6 +336,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BreakRoute: BreakRouteWithChildren,
   BuildRoute: BuildRouteWithChildren,
+  EngineRoute: EngineRoute,
   HistoryRoute: HistoryRoute,
   MorningRoute: MorningRoute,
   ReviewRoute: ReviewRoute,
