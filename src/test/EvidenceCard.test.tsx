@@ -34,7 +34,7 @@ describe("EvidenceCard", () => {
       "I listened without interrupting and kept my voice calm.",
     );
     expect(preview).toBeTruthy();
-    expect(preview.className).toContain("line-clamp-2");
+    expect(preview).toHaveClass("line-clamp-2");
   });
 
   it("does not show Situation label or text when collapsed", () => {
