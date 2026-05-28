@@ -51,7 +51,7 @@ export const Route = createRootRoute({
     }
 
     if (location.pathname === "/auth") {
-      throw redirect({ to: "/morning" });
+      throw redirect({ to: "/engine" });
     }
 
     const { data: profile } = await supabase
@@ -67,7 +67,7 @@ export const Route = createRootRoute({
     }
 
     if (setupComplete && location.pathname === "/setup") {
-      throw redirect({ to: "/morning" });
+      throw redirect({ to: "/engine" });
     }
   },
   component: RootLayout,
