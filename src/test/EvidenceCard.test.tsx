@@ -30,11 +30,11 @@ describe("EvidenceCard", () => {
 
   it("renders what_i_did_well preview when collapsed", () => {
     render(<EvidenceCard entry={BASE} isOpen={false} onToggle={vi.fn()} />);
-    expect(
-      screen.getByText(
-        "I listened without interrupting and kept my voice calm.",
-      ),
-    ).toBeTruthy();
+    const preview = screen.getByText(
+      "I listened without interrupting and kept my voice calm.",
+    );
+    expect(preview).toBeTruthy();
+    expect(preview.className).toContain("line-clamp-2");
   });
 
   it("does not show Situation label or text when collapsed", () => {
@@ -43,10 +43,11 @@ describe("EvidenceCard", () => {
     expect(
       screen.queryByText("A difficult conversation with a colleague."),
     ).toBeNull();
+    expect(screen.queryByText("What I did well")).toBeNull();
   });
 
   it("shows Situation label and text when expanded", () => {
-    render(<EvidenceCard entry={BASE} isOpen={true} onToggle={vi.fn()} />);
+    render(<EvidenceCard entry={BASE} isOpen onToggle={vi.fn()} />);
     expect(screen.getByText("Situation")).toBeTruthy();
     expect(
       screen.getByText("A difficult conversation with a colleague."),
@@ -54,7 +55,7 @@ describe("EvidenceCard", () => {
   });
 
   it("shows What I did well label when expanded", () => {
-    render(<EvidenceCard entry={BASE} isOpen={true} onToggle={vi.fn()} />);
+    render(<EvidenceCard entry={BASE} isOpen onToggle={vi.fn()} />);
     expect(screen.getByText("What I did well")).toBeTruthy();
   });
 
