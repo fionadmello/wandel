@@ -3,12 +3,13 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EvidenceEditor } from "@/features/engine/EvidenceEditor";
-import { useAddEvidence } from "@/hooks/useSelfWorthEvidence";
 
 const mockMutate = vi.fn();
 
+let mockIsPending = false;
+
 vi.mock("@/hooks/useSelfWorthEvidence", () => ({
-  useAddEvidence: () => ({ mutate: mockMutate, isPending: false }),
+  useAddEvidence: () => ({ mutate: mockMutate, isPending: mockIsPending }),
 }));
 
 const DEFAULT_PROPS = {
@@ -21,6 +22,7 @@ let onSuccess: ReturnType<typeof vi.fn>;
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockIsPending = false;
   onClose = vi.fn();
   onSuccess = vi.fn();
 });
@@ -114,10 +116,7 @@ describe("EvidenceEditor", () => {
   });
 
   it("submit button is disabled while mutation is pending", () => {
-    vi.mocked(useAddEvidence).mockReturnValueOnce({
-      mutate: mockMutate,
-      isPending: true,
-    } as unknown as ReturnType<typeof useAddEvidence>);
+    mockIsPending = true;
     render(
       <EvidenceEditor
         {...DEFAULT_PROPS}
