@@ -17,8 +17,8 @@ const DEFAULT_PROPS = {
   date: "2026-05-28",
 };
 
-let onClose: ReturnType<typeof vi.fn>;
-let onSuccess: ReturnType<typeof vi.fn>;
+let onClose: () => void;
+let onSuccess: () => void;
 
 beforeEach(() => {
   vi.clearAllMocks();
