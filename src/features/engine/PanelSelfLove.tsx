@@ -22,29 +22,28 @@ export function PanelSelfLove({ userId, date }: PanelSelfLoveProps) {
 
   const { data: entries = [] } = useSelfLoveEntries(userId);
   const { data: practices } = usePractices(userId);
-  const seedDefaults = useSeedDefaultPractices(userId);
+  const {
+    isPending: seedPending,
+    isSuccess: seedSuccess,
+    mutate: seedMutate,
+  } = useSeedDefaultPractices(userId);
 
   useEffect(() => {
     if (
       practices !== undefined &&
       practices.length === 0 &&
-      !seedDefaults.isPending &&
-      !seedDefaults.isSuccess
+      !seedPending &&
+      !seedSuccess
     ) {
-      seedDefaults.mutate();
+      seedMutate();
     }
-  }, [
-    practices,
-    seedDefaults.isPending,
-    seedDefaults.isSuccess,
-    seedDefaults.mutate,
-  ]);
+  }, [practices, seedPending, seedSuccess, seedMutate]);
 
   const displayed = entries.slice(0, 4);
   const overflow = entries.length - 4;
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 bg-card rounded-2xl border-l-[3px] border-l-amber px-5 py-4">
       <PanelHeader
         number={2}
         title="Self-Love"

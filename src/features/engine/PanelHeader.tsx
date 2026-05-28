@@ -1,5 +1,5 @@
 import type { AccentColor } from "@/constants/accentClasses";
-import { ACCENT_BORDER, ACCENT_TEXT } from "@/constants/accentClasses";
+import { ACCENT_TEXT } from "@/constants/accentClasses";
 
 interface PanelHeaderProps {
   number: number;
@@ -17,9 +17,7 @@ export function PanelHeader({
   const paddedNumber = String(number).padStart(2, "0");
 
   return (
-    <div
-      className={`flex flex-col gap-1 py-4 px-5 bg-card rounded-2xl border-l-[3px] ${ACCENT_BORDER[accent]}`}
-    >
+    <div className="flex flex-col gap-1">
       <span
         className={`font-sans text-[10px] font-medium tracking-widest uppercase ${ACCENT_TEXT[accent]}`}
       >

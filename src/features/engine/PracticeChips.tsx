@@ -17,7 +17,7 @@ export function PracticeChips({ userId, onSelect }: PracticeChipsProps) {
           key={practice.id}
           type="button"
           onClick={() => onSelect(practice)}
-          className="bg-card rounded-full px-4 py-2 font-sans text-[12px] text-plum font-medium shadow-sm shrink-0"
+          className="bg-amber/10 rounded-full px-4 py-2 font-sans text-[12px] text-amber font-medium shrink-0"
         >
           {practice.name}
         </button>

@@ -52,12 +52,12 @@ export function SelfLoveCard({ entry }: SelfLoveCardProps) {
       <button
         type="button"
         onClick={() => setNoteOpen((o) => !o)}
-        className="w-full text-left bg-card rounded-2xl px-4 py-4"
+        className="w-full text-left bg-canvas rounded-2xl px-4 py-4"
       >
         {content}
       </button>
     );
   }
 
-  return <div className="bg-card rounded-2xl px-4 py-4">{content}</div>;
+  return <div className="bg-canvas rounded-2xl px-4 py-4">{content}</div>;
 }

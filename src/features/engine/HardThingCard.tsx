@@ -18,7 +18,7 @@ export function HardThingCard({ entry }: HardThingCardProps) {
     <button
       type="button"
       onClick={() => hasNote && setNoteOpen((o) => !o)}
-      className="w-full text-left bg-card rounded-2xl px-4 py-4 flex flex-col gap-3"
+      className="w-full text-left bg-canvas rounded-2xl px-4 py-4 flex flex-col gap-3"
     >
       <span className="font-serif text-[15px] font-semibold leading-snug text-plum">
         {what}

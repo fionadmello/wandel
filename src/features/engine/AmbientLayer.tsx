@@ -1,7 +1,6 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 
-import { ReminderCard } from "@/components/ui/ReminderCard";
 import { useProfile } from "@/hooks/useProfile";
 import { useReminderRotation } from "@/hooks/useReminderRotation";
 
@@ -33,11 +32,15 @@ export function AmbientLayer({ userId }: AmbientLayerProps) {
         )}
       </button>
 
-      {expanded && reminder && <ReminderCard text={reminder} />}
-
       {expanded && whyStatement && (
-        <p className="font-serif italic text-[15px] text-violet leading-[1.7]">
+        <p className="font-serif italic text-[17px] text-plum leading-[1.7]">
           {whyStatement}
+        </p>
+      )}
+
+      {expanded && reminder && (
+        <p className="font-sans text-[12px] text-muted leading-[1.6]">
+          {reminder}
         </p>
       )}
     </div>
