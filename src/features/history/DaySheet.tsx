@@ -5,13 +5,12 @@ import { X } from "lucide-react";
 import type {
   BreakObservationWithEmotions,
   BuildObservation,
-  EngineMark,
   HabitWithConfigs,
 } from "@/types/database";
 
 interface DaySheetProps {
   date: string;
-  engineMark: EngineMark | null;
+  hasEngineActivity: boolean;
   breakObs: BreakObservationWithEmotions[];
   buildObs: BuildObservation[];
   breakHabits: HabitWithConfigs[];
@@ -22,7 +21,7 @@ interface DaySheetProps {
 
 export function DaySheet({
   date,
-  engineMark,
+  hasEngineActivity,
   breakObs,
   buildObs,
   breakHabits,
@@ -37,7 +36,11 @@ export function DaySheet({
   );
   const goTo = (path: string) => {
     onClose();
-    navigate({ to: path as "/morning" });
+    navigate({ to: path as "/engine" });
+  };
+  const goToEngine = () => {
+    onClose();
+    navigate({ to: "/engine", search: { date } });
   };
 
   return (
@@ -64,22 +67,18 @@ export function DaySheet({
         </div>
 
         <div className="flex flex-col gap-5 px-6 pb-8">
-          {/* Mirror practice */}
+          {/* Engine */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-violet shrink-0" />
-              <p className="font-sans text-[11px] font-medium text-violet uppercase tracking-[0.08em]">
-                Mirror practice
+              <span className="w-2 h-2 rounded-full bg-amber shrink-0" />
+              <p className="font-sans text-[11px] font-medium text-amber uppercase tracking-[0.08em]">
+                Engine
               </p>
             </div>
-            {engineMark ? (
+            {hasEngineActivity ? (
               <div className="bg-card rounded-2xl px-4 py-3">
                 <p className="font-sans text-[13px] text-plum">
-                  Showed up
-                  {engineMark.timer_completed ? " · Timer completed" : ""}
-                </p>
-                <p className="font-sans text-[11px] text-muted">
-                  {format(new Date(engineMark.confirmed_at), "h:mm a")}
+                  Activity logged
                 </p>
               </div>
             ) : (
@@ -88,10 +87,10 @@ export function DaySheet({
                 {!isFuture && (
                   <button
                     type="button"
-                    onClick={() => goTo(`/morning?date=${date}` as "/morning")}
-                    className="font-sans text-[11px] font-medium text-violet bg-transparent border-none cursor-pointer"
+                    onClick={goToEngine}
+                    className="font-sans text-[11px] font-medium text-amber bg-transparent border-none cursor-pointer"
                   >
-                    Add it
+                    Go to Engine →
                   </button>
                 )}
               </div>
@@ -223,7 +222,7 @@ export function DaySheet({
 
           {breakHabits.length === 0 &&
             buildHabits.length === 0 &&
-            !engineMark && (
+            !hasEngineActivity && (
               <p className="font-sans text-[13px] text-muted text-center py-4">
                 Nothing logged this day.
               </p>

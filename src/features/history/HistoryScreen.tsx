@@ -7,7 +7,7 @@ import { useBuildHabits } from "@/hooks/useBuildHabits";
 import {
   useMonthBreakObservations,
   useMonthBuildObservations,
-  useMonthEngineMarks,
+  useMonthEngineActivity,
 } from "@/hooks/useMonthData";
 import { useSession } from "@/hooks/useSession";
 import { useAllStandingUpEntries } from "@/hooks/useStandingUpLog";
@@ -28,14 +28,14 @@ function HistoryContent({ userId }: HistoryContentProps) {
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
-  const engineMarksQuery = useMonthEngineMarks(userId, year, month);
+  const engineActivityQuery = useMonthEngineActivity(userId, year, month);
   const breakObsQuery = useMonthBreakObservations(userId, year, month);
   const buildObsQuery = useMonthBuildObservations(userId, year, month);
   const breakHabitsQuery = useBreakHabits(userId);
   const buildHabitsQuery = useBuildHabits(userId);
   const allStandingUpQuery = useAllStandingUpEntries(userId);
 
-  const engineMarks = engineMarksQuery.data ?? [];
+  const engineActivitySet = new Set(engineActivityQuery.data ?? []);
   const breakObs = breakObsQuery.data ?? [];
   const buildObs = buildObsQuery.data ?? [];
   const breakHabits = breakHabitsQuery.data ?? [];
@@ -93,9 +93,9 @@ function HistoryContent({ userId }: HistoryContentProps) {
     } else setMonth((m: number) => m + 1);
   };
 
-  const selectedMark = selectedDate
-    ? (engineMarks.find((m) => m.date === selectedDate) ?? null)
-    : null;
+  const hasEngineActivity = selectedDate
+    ? engineActivitySet.has(selectedDate)
+    : false;
 
   const selectedBreakObs = selectedDate
     ? breakObs.filter((o) => o.logged_at.slice(0, 10) === selectedDate)
@@ -114,7 +114,7 @@ function HistoryContent({ userId }: HistoryContentProps) {
       <CalendarGrid
         year={year}
         month={month}
-        engineMarks={engineMarks}
+        engineActivityDates={engineActivityQuery.data ?? []}
         breakHabits={breakHabits}
         breakObs={breakObs}
         buildObs={buildObs}
@@ -123,8 +123,8 @@ function HistoryContent({ userId }: HistoryContentProps) {
 
       <div className="flex items-center justify-center gap-4 px-4 pt-2 pb-1">
         <div className="flex items-center gap-1.5">
-          <span className="w-[5px] h-[5px] rounded-full bg-violet" />
-          <span className="font-sans text-[10px] text-muted">Mirror</span>
+          <span className="w-[5px] h-[5px] rounded-full bg-amber" />
+          <span className="font-sans text-[10px] text-muted">Engine</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="w-[5px] h-[5px] rounded-full bg-teal" />
@@ -152,7 +152,7 @@ function HistoryContent({ userId }: HistoryContentProps) {
       {selectedDate && (
         <DaySheet
           date={selectedDate}
-          engineMark={selectedMark}
+          hasEngineActivity={hasEngineActivity}
           breakObs={selectedBreakObs}
           buildObs={selectedBuildObs}
           breakHabits={breakHabits}

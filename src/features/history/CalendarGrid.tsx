@@ -4,7 +4,6 @@ import { buildCalendarGrid } from "@/constants/calendarGrid";
 import type {
   BreakObservationWithEmotions,
   BuildObservation,
-  EngineMark,
   Habit,
 } from "@/types/database";
 
@@ -15,7 +14,7 @@ const WEEK_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 interface CalendarGridProps {
   year: number;
   month: number;
-  engineMarks: EngineMark[];
+  engineActivityDates: string[];
   breakHabits: Habit[];
   breakObs: BreakObservationWithEmotions[];
   buildObs: BuildObservation[];
@@ -25,7 +24,7 @@ interface CalendarGridProps {
 export function CalendarGrid({
   year,
   month,
-  engineMarks,
+  engineActivityDates,
   breakHabits,
   breakObs,
   buildObs,
@@ -36,7 +35,7 @@ export function CalendarGrid({
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
 
-  const markDates = new Set(engineMarks.map((m) => m.date));
+  const activitySet = new Set(engineActivityDates);
 
   // Dates where the break habit was used (an observation was logged)
   const breakUsedByDate = new Map<string, Set<string>>();
@@ -80,7 +79,7 @@ export function CalendarGrid({
                 key={cell.date}
                 date={cell.date}
                 day={cell.day}
-                hasMirror={markDates.has(cell.date)}
+                hasEngineActivity={activitySet.has(cell.date)}
                 breakCount={
                   eligibleBreakHabits.filter(
                     (h) =>

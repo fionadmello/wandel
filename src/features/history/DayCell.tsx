@@ -3,7 +3,7 @@ import { format } from "date-fns";
 interface DayCellProps {
   date: string;
   day: number;
-  hasMirror: boolean;
+  hasEngineActivity: boolean;
   breakCount: number;
   buildCount: number;
   isFuture: boolean;
@@ -13,13 +13,13 @@ interface DayCellProps {
 export function DayCell({
   date,
   day,
-  hasMirror,
+  hasEngineActivity,
   breakCount,
   buildCount,
   isFuture,
   onTap,
 }: DayCellProps) {
-  const hasData = hasMirror || breakCount > 0 || buildCount > 0;
+  const hasData = hasEngineActivity || breakCount > 0 || buildCount > 0;
   const today = format(new Date(), "yyyy-MM-dd");
   const isActualToday = date === today;
 
@@ -39,8 +39,8 @@ export function DayCell({
         {day}
       </span>
       <div className="flex flex-wrap justify-center gap-[3px]">
-        {hasMirror && (
-          <span className="w-[5px] h-[5px] rounded-full bg-violet" />
+        {hasEngineActivity && (
+          <span className="w-[5px] h-[5px] rounded-full bg-amber" />
         )}
         {Array.from({ length: breakCount }).map((_, i) => (
           <span key={i} className="w-[5px] h-[5px] rounded-full bg-teal" />
