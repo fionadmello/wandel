@@ -110,7 +110,7 @@ function SettingsForm({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => navigate({ to: "/morning" })}
+            onClick={() => navigate({ to: "/engine" })}
             className="p-1 text-muted bg-transparent border-none cursor-pointer shrink-0"
             aria-label="Go back"
           >
