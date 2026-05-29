@@ -11,13 +11,13 @@ export function PracticeChips({ userId, onSelect }: PracticeChipsProps) {
   const active = practices.filter((p) => p.active);
 
   return (
-    <div className="flex gap-2 overflow-x-auto">
+    <div className="flex flex-wrap gap-2">
       {active.map((practice) => (
         <button
           key={practice.id}
           type="button"
           onClick={() => onSelect(practice)}
-          className="bg-amber/10 rounded-full px-4 py-2 font-sans text-[12px] text-amber font-medium shrink-0"
+          className="bg-amber/10 rounded-full px-4 py-2 font-sans text-[12px] text-amber font-medium"
         >
           {practice.name}
         </button>
