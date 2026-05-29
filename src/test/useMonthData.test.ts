@@ -12,27 +12,23 @@ import {
 
 const { mockQuery } = vi.hoisted(() => ({ mockQuery: vi.fn() }));
 
-vi.mock("@/lib/supabase", () => ({
-  supabase: {
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          gte: () => ({
-            lte: () => ({
-              // thenable: for hooks that end at .lte() (engine marks)
-              then: (
-                resolve: (v: unknown) => void,
-                reject: (e: unknown) => void,
-              ) => mockQuery().then(resolve, reject),
-              // chainable: for hooks that call .order() after .lte()
-              order: () => mockQuery(),
-            }),
-          }),
-        }),
+vi.mock("@/lib/supabase", () => {
+  const lte = () => ({
+    then: (resolve: (v: unknown) => void, reject: (e: unknown) => void) =>
+      mockQuery().then(resolve, reject),
+    order: () => mockQuery(),
+  });
+  const gte = { lte };
+  const eq: Record<string, unknown> = { gte: () => gte };
+  eq.eq = () => eq;
+  return {
+    supabase: {
+      from: () => ({
+        select: () => eq,
       }),
-    }),
-  },
-}));
+    },
+  };
+});
 
 const ENGINE_MARK = {
   id: "em-1",
@@ -175,7 +171,7 @@ describe("useMonthBuildObservations", () => {
 });
 
 describe("useMonthEngineActivity", () => {
-  it("returns deduplicated union of dates across all three tables", async () => {
+  it("returns deduplicated union of dates across all four tables", async () => {
     mockQuery
       .mockReturnValueOnce(
         Promise.resolve({
@@ -194,6 +190,12 @@ describe("useMonthEngineActivity", () => {
           data: [{ date: "2026-04-15" }],
           error: null,
         }),
+      )
+      .mockReturnValueOnce(
+        Promise.resolve({
+          data: [{ date: "2026-04-20" }],
+          error: null,
+        }),
       );
 
     const { result } = renderHook(
@@ -207,11 +209,13 @@ describe("useMonthEngineActivity", () => {
       "2026-04-05",
       "2026-04-10",
       "2026-04-15",
+      "2026-04-20",
     ]);
   });
 
-  it("returns empty array when all three tables return empty", async () => {
+  it("returns empty array when all four tables return empty", async () => {
     mockQuery
+      .mockReturnValueOnce(Promise.resolve({ data: [], error: null }))
       .mockReturnValueOnce(Promise.resolve({ data: [], error: null }))
       .mockReturnValueOnce(Promise.resolve({ data: [], error: null }))
       .mockReturnValueOnce(Promise.resolve({ data: [], error: null }));
@@ -231,7 +235,25 @@ describe("useMonthEngineActivity", () => {
         Promise.resolve({ data: null, error: { message: "DB error" } }),
       )
       .mockReturnValueOnce(Promise.resolve({ data: [], error: null }))
+      .mockReturnValueOnce(Promise.resolve({ data: [], error: null }))
       .mockReturnValueOnce(Promise.resolve({ data: [], error: null }));
+
+    const { result } = renderHook(
+      () => useMonthEngineActivity("user-1", 2026, 4),
+      { wrapper },
+    );
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+
+  it("throws when the take_up_space_log table errors", async () => {
+    mockQuery
+      .mockReturnValueOnce(Promise.resolve({ data: [], error: null }))
+      .mockReturnValueOnce(Promise.resolve({ data: [], error: null }))
+      .mockReturnValueOnce(Promise.resolve({ data: [], error: null }))
+      .mockReturnValueOnce(
+        Promise.resolve({ data: null, error: { message: "DB error" } }),
+      );
 
     const { result } = renderHook(
       () => useMonthEngineActivity("user-1", 2026, 4),

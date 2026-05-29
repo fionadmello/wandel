@@ -94,7 +94,7 @@ export function useMonthEngineActivity(
   return useQuery({
     queryKey: ["engine_activity_month", userId, year, month],
     queryFn: async () => {
-      const [hardThings, selfLove, selfWorth] = (await Promise.all([
+      const [hardThings, selfLove, selfWorth, tusLog] = (await Promise.all([
         supabase
           .from("hard_things_log")
           .select("date")
@@ -113,7 +113,15 @@ export function useMonthEngineActivity(
           .eq("user_id", userId)
           .gte("date", first)
           .lte("date", last),
+        supabase
+          .from("take_up_space_log")
+          .select("date")
+          .eq("user_id", userId)
+          .eq("status", "complete")
+          .gte("date", first)
+          .lte("date", last),
       ])) as [
+        { data: Array<{ date: string }> | null; error: unknown },
         { data: Array<{ date: string }> | null; error: unknown },
         { data: Array<{ date: string }> | null; error: unknown },
         { data: Array<{ date: string }> | null; error: unknown },
@@ -122,11 +130,13 @@ export function useMonthEngineActivity(
       if (hardThings.error) throw hardThings.error;
       if (selfLove.error) throw selfLove.error;
       if (selfWorth.error) throw selfWorth.error;
+      if (tusLog.error) throw tusLog.error;
 
       const dates = [
         ...(hardThings.data ?? []),
         ...(selfLove.data ?? []),
         ...(selfWorth.data ?? []),
+        ...(tusLog.data ?? []),
       ].map((row) => row.date);
 
       return [...new Set(dates)];
