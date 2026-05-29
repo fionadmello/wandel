@@ -13,6 +13,7 @@
   --color-teal: #5dcaa5;
   --color-gold: #c4883a;
   --color-slip: #c4786a;
+  --color-rose: #c4637a;
 
   /* Fonts */
   --font-serif: "Cormorant", Georgia, serif;
@@ -131,6 +132,14 @@
     background: linear-gradient(
       to right,
       var(--color-teal) var(--panel-fill, 0%),
+      var(--color-soft) var(--panel-fill, 0%)
+    );
+  }
+
+  .panel-slider-rose {
+    background: linear-gradient(
+      to right,
+      var(--color-rose) var(--panel-fill, 0%),
       var(--color-soft) var(--panel-fill, 0%)
     );
   }
