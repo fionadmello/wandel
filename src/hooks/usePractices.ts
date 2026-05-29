@@ -40,10 +40,7 @@ export function useSeedDefaultPractices(userId: string) {
       }));
       const { error } = await supabase
         .from("practice_collection")
-        .upsert(practices, {
-          onConflict: "user_id,name",
-          ignoreDuplicates: true,
-        });
+        .insert(practices);
       if (error) throw error;
     },
     onSuccess: () => {

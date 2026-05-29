@@ -11,12 +11,14 @@ import {
 } from "@/hooks/usePractices";
 import type { Practice } from "@/types/engine";
 
-const { mockOrder, mockUpsert, mockSingle, mockDelete } = vi.hoisted(() => ({
-  mockOrder: vi.fn(),
-  mockUpsert: vi.fn(),
-  mockSingle: vi.fn(),
-  mockDelete: vi.fn(),
-}));
+const { mockOrder, mockInsert, mockUpsert, mockSingle, mockDelete } =
+  vi.hoisted(() => ({
+    mockOrder: vi.fn(),
+    mockInsert: vi.fn(),
+    mockUpsert: vi.fn(),
+    mockSingle: vi.fn(),
+    mockDelete: vi.fn(),
+  }));
 
 vi.mock("@/lib/supabase", () => {
   const upsertResult = {
@@ -28,6 +30,10 @@ vi.mock("@/lib/supabase", () => {
   builder.select = () => builder;
   builder.eq = () => builder;
   builder.order = mockOrder;
+  builder.insert = () => ({
+    then: (resolve: (v: unknown) => void, reject: (e: unknown) => void) =>
+      mockInsert().then(resolve, reject),
+  });
   builder.upsert = () => upsertResult;
   builder.delete = () => ({ eq: () => ({ eq: () => mockDelete() }) });
   return { supabase: { from: () => builder } };
@@ -89,7 +95,7 @@ describe("usePractices", () => {
 
 describe("useSeedDefaultPractices", () => {
   it("resolves without throwing on success", async () => {
-    mockUpsert.mockReturnValue(Promise.resolve({ error: null }));
+    mockInsert.mockReturnValue(Promise.resolve({ error: null }));
 
     const { result } = renderHook(() => useSeedDefaultPractices("user-1"), {
       wrapper,
@@ -102,8 +108,8 @@ describe("useSeedDefaultPractices", () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
   });
 
-  it("throws when upsert errors", async () => {
-    mockUpsert.mockReturnValue(
+  it("throws when insert errors", async () => {
+    mockInsert.mockReturnValue(
       Promise.resolve({ error: { message: "DB error" } }),
     );
 
