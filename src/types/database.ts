@@ -535,6 +535,86 @@ export interface Database {
         };
         Relationships: [];
       };
+      take_up_space_log: {
+        Row: {
+          id: string;
+          user_id: string;
+          date: string;
+          mode: string;
+          situation: string | null;
+          action: string | null;
+          cost: string | null;
+          need: string | null;
+          choice_text: string | null;
+          teaching: string | null;
+          tag_ids: string[];
+          tag_names: string[];
+          choice_outcome: string | null;
+          panel_tag: string | null;
+          status: string;
+          created_at: string;
+          completed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          date: string;
+          mode?: string;
+          situation?: string | null;
+          action?: string | null;
+          cost?: string | null;
+          need?: string | null;
+          choice_text?: string | null;
+          teaching?: string | null;
+          tag_ids?: string[];
+          tag_names?: string[];
+          choice_outcome?: string | null;
+          panel_tag?: string | null;
+          status?: string;
+          created_at?: string;
+          completed_at?: string | null;
+        };
+        Update: {
+          date?: string;
+          mode?: string;
+          situation?: string | null;
+          action?: string | null;
+          cost?: string | null;
+          need?: string | null;
+          choice_text?: string | null;
+          teaching?: string | null;
+          tag_ids?: string[];
+          tag_names?: string[];
+          choice_outcome?: string | null;
+          panel_tag?: string | null;
+          status?: string;
+          completed_at?: string | null;
+        };
+        Relationships: [];
+      };
+      take_up_space_tags: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          is_default: boolean;
+          active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          is_default?: boolean;
+          active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          name?: string;
+          active?: boolean;
+        };
+        Relationships: [];
+      };
     };
   };
 }
