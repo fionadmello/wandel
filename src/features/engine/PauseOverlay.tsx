@@ -1,8 +1,12 @@
 interface PauseOverlayProps {
   visible: boolean;
+  message?: string;
 }
 
-export function PauseOverlay({ visible }: PauseOverlayProps) {
+export function PauseOverlay({
+  visible,
+  message = "You did great!",
+}: PauseOverlayProps) {
   return (
     <div
       aria-hidden={!visible}
@@ -11,7 +15,7 @@ export function PauseOverlay({ visible }: PauseOverlayProps) {
       }`}
     >
       <span className="font-serif text-[28px] font-semibold text-plum">
-        You did great!
+        {message}
       </span>
     </div>
   );

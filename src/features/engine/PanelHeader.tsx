@@ -6,6 +6,7 @@ interface PanelHeaderProps {
   title: string;
   subtitle: string;
   accent: AccentColor;
+  action?: React.ReactNode;
 }
 
 export function PanelHeader({
@@ -13,6 +14,7 @@ export function PanelHeader({
   title,
   subtitle,
   accent,
+  action,
 }: PanelHeaderProps) {
   const paddedNumber = String(number).padStart(2, "0");
 
@@ -23,9 +25,12 @@ export function PanelHeader({
       >
         {paddedNumber}
       </span>
-      <span className="font-serif text-[22px] font-semibold leading-[1.1] text-plum">
-        {title}
-      </span>
+      <div className="flex justify-between items-center">
+        <span className="font-serif text-[22px] font-semibold leading-[1.1] text-plum">
+          {title}
+        </span>
+        {action}
+      </div>
       <span className="font-sans text-[11px] text-muted tracking-[0.02em]">
         {subtitle}
       </span>
