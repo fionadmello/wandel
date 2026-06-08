@@ -8,6 +8,7 @@ import { AmbientLayer } from "@/features/engine/AmbientLayer";
 import { PanelSelfLove } from "@/features/engine/PanelSelfLove";
 import { PanelSelfRespect } from "@/features/engine/PanelSelfRespect";
 import { PanelSelfWorth } from "@/features/engine/PanelSelfWorth";
+import { PanelTakeUpSpace } from "@/features/engine/PanelTakeUpSpace";
 import { WeeklyReviewPrompt } from "@/features/engine/WeeklyReviewPrompt";
 import { useSession } from "@/hooks/useSession";
 import { mostRecentSunday } from "@/hooks/useWeeklyReview";
@@ -36,6 +37,7 @@ function EngineContent({ userId, initialLogDate }: EngineContentProps) {
         <PanelSelfRespect userId={userId} date={logDate} />
         <PanelSelfLove userId={userId} date={logDate} />
         <PanelSelfWorth userId={userId} date={logDate} />
+        <PanelTakeUpSpace userId={userId} />
         <WeeklyReviewPrompt
           mostRecentReview={mostRecentReview}
           isSundayToday={isSundayToday}
